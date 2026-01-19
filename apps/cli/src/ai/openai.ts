@@ -16,6 +16,15 @@ export class OpenAIProvider implements AIProvider {
     this.model = config.aiModel;
   }
 
+  /**
+   * Clean JSON response by removing markdown code blocks
+   */
+  private cleanJsonResponse(content: string): string {
+    // Remove markdown code blocks like ```json ... ```
+    const cleaned = content.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+    return cleaned.trim();
+  }
+
   async analyze(problem: Problem, context: Problem[]): Promise<AIAnalysis> {
     const contextText = context.length > 0
       ? `\n\nRecent problems for context:\n${context.slice(0, 5).map(p => `- ${p.text}`).join('\n')}`
@@ -39,7 +48,6 @@ Keep it concise and actionable.`;
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
         max_tokens: 500,
-        response_format: { type: 'json_object' },
       });
 
       const content = response.choices[0]?.message?.content;
@@ -47,7 +55,8 @@ Keep it concise and actionable.`;
         throw new Error('No response from AI');
       }
 
-      const parsed = JSON.parse(content);
+      const cleanedContent = this.cleanJsonResponse(content);
+      const parsed = JSON.parse(cleanedContent);
 
       // Map related problem indices to IDs
       const relatedProblems = (parsed.relatedProblems || [])
@@ -100,7 +109,6 @@ Focus on meta-learning and skill development.`;
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
         max_tokens: 1500,
-        response_format: { type: 'json_object' },
       });
 
       const content = response.choices[0]?.message?.content;
@@ -108,7 +116,8 @@ Focus on meta-learning and skill development.`;
         throw new Error('No response from AI');
       }
 
-      const parsed = JSON.parse(content);
+      const cleanedContent = this.cleanJsonResponse(content);
+      const parsed = JSON.parse(cleanedContent);
 
       return {
         patterns: (parsed.patterns || []).map((p: any) => ({
@@ -160,7 +169,6 @@ Focus on growth and improvement.`;
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
         max_tokens: 2000,
-        response_format: { type: 'json_object' },
       });
 
       const content = response.choices[0]?.message?.content;
@@ -168,7 +176,8 @@ Focus on growth and improvement.`;
         throw new Error('No response from AI');
       }
 
-      const parsed = JSON.parse(content);
+      const cleanedContent = this.cleanJsonResponse(content);
+      const parsed = JSON.parse(cleanedContent);
 
       return {
         period,
