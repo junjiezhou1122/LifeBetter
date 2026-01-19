@@ -173,3 +173,72 @@ export function formatTimeAgo(isoDate: string): string {
     hour12: true
   });
 }
+
+/**
+ * Search problems by partial text match (case-insensitive)
+ */
+export function searchProblems(searchText: string): Problem[] {
+  const storage = readStorage();
+  const lowerSearch = searchText.toLowerCase();
+
+  return storage.problems.filter(problem =>
+    problem.text.toLowerCase().includes(lowerSearch)
+  );
+}
+
+/**
+ * Delete a problem by ID
+ */
+export function deleteProblem(id: string): Problem | null {
+  const storage = readStorage();
+  const index = storage.problems.findIndex(p => p.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const deleted = storage.problems[index];
+  storage.problems.splice(index, 1);
+  writeStorage(storage);
+
+  return deleted;
+}
+
+/**
+ * Update a problem (for adding AI analysis)
+ */
+export function updateProblem(id: string, updates: Partial<Problem>): Problem | null {
+  const storage = readStorage();
+  const index = storage.problems.findIndex(p => p.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  storage.problems[index] = { ...storage.problems[index], ...updates };
+  writeStorage(storage);
+
+  return storage.problems[index];
+}
+
+/**
+ * Get problems within a date range
+ */
+export function getProblemsInRange(from: Date, to: Date): Problem[] {
+  const allProblems = getAllProblems();
+  const fromTime = from.getTime();
+  const toTime = to.getTime();
+
+  return allProblems.filter(problem => {
+    const problemTime = new Date(problem.createdAt).getTime();
+    return problemTime >= fromTime && problemTime <= toTime;
+  });
+}
+
+/**
+ * Get a problem by ID
+ */
+export function getProblemById(id: string): Problem | null {
+  const storage = readStorage();
+  return storage.problems.find(p => p.id === id) || null;
+}
