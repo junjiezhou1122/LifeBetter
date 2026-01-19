@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { TaskCard } from './TaskCard';
 import { AddTaskModal } from './AddTaskModal';
-import { BreakdownModal } from './BreakdownModal';
+import { Sidebar } from './Sidebar';
+import { BreakdownSidebarContent } from './BreakdownSidebarContent';
 import { ChevronLeft, Plus } from 'lucide-react';
 
 type TaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
@@ -40,7 +41,7 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
-  const [breakdownModalState, setBreakdownModalState] = useState<{
+  const [breakdownSidebar, setBreakdownSidebar] = useState<{
     isOpen: boolean;
     id: string;
     title: string;
@@ -134,6 +135,7 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
       const res = await fetch(url);
       const tasksData = await res.json();
       setTasks(tasksData);
+      setBreakdownSidebar({ ...breakdownSidebar, isOpen: false });
     } catch (error) {
       console.error('Failed to refresh tasks:', error);
     }
@@ -185,14 +187,19 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
         parentTitle={problemTitle}
       />
 
-      <BreakdownModal
-        isOpen={breakdownModalState.isOpen}
-        onClose={() => setBreakdownModalState({ ...breakdownModalState, isOpen: false })}
-        onConfirm={handleBreakdownConfirm}
-        type="task"
-        id={breakdownModalState.id}
-        title={breakdownModalState.title}
-      />
+      <Sidebar
+        isOpen={breakdownSidebar.isOpen}
+        onClose={() => setBreakdownSidebar({ ...breakdownSidebar, isOpen: false })}
+        side="right"
+        title="AI Breakdown"
+      >
+        <BreakdownSidebarContent
+          type="task"
+          id={breakdownSidebar.id}
+          title={breakdownSidebar.title}
+          onConfirm={handleBreakdownConfirm}
+        />
+      </Sidebar>
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-4 gap-4 h-[calc(100vh-200px)]">
@@ -229,7 +236,7 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
                               <TaskCard
                                 task={task}
                                 onClick={() => onTaskClick(task)}
-                                onBreakdown={() => setBreakdownModalState({
+                                onBreakdown={() => setBreakdownSidebar({
                                   isOpen: true,
                                   id: task.id,
                                   title: task.title

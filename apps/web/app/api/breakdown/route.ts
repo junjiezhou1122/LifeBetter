@@ -27,6 +27,11 @@ function writeStorage(storage: any) {
 
 function getAIClient() {
   const apiKey = process.env.OPENAI_API_KEY || process.env.DEEPSEEK_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('No AI API key configured. Please set OPENAI_API_KEY or DEEPSEEK_API_KEY in .env.local');
+  }
+
   const baseURL = process.env.DEEPSEEK_API_KEY
     ? 'https://api.deepseek.com'
     : undefined;

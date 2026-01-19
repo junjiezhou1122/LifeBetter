@@ -7,8 +7,7 @@ import { TaskBoard } from './TaskBoard';
 import { Sidebar } from './Sidebar';
 import { NotificationPanel } from './NotificationPanel';
 import { EditableProblemCard } from './EditableProblemCard';
-import { BreakdownSidebarContent } from './BreakdownSidebarContent';
-import { Plus, Target } from 'lucide-react';
+import { Plus, Target, Sparkles } from 'lucide-react';
 
 type ProblemStatus = 'backlog' | 'todo' | 'in_progress' | 'blocked' | 'done';
 
@@ -143,6 +142,7 @@ export function KanbanBoard() {
   };
 
   const handleTaskClick = (task: Task) => {
+    const currentItem = navigationStack[navigationStack.length - 1];
     setNavigationStack([...navigationStack, { type: 'task', id: task.id, title: task.title }]);
   };
 
@@ -177,13 +177,12 @@ export function KanbanBoard() {
     setShowEditableCard(false);
   };
 
-  const handleBreakdownConfirm = async () => {
+  const handleBreakdownConfirm = async (newTasks: any[]) => {
     // Tasks are already created by the API, just refresh the tasks list
     try {
       const res = await fetch('/api/tasks');
       const tasksData = await res.json();
       setTasks(tasksData);
-      setBreakdownSidebar({ ...breakdownSidebar, isOpen: false });
     } catch (error) {
       console.error('Failed to refresh tasks:', error);
     }
@@ -265,103 +264,67 @@ export function KanbanBoard() {
         </div>
 
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className="grid grid-cols-5 gap-4 h-[calc(100vh-200px)]">
-            {COLUMNS.map(column => {
-              const columnProblems = problems.filter(p => p.status === column.id);
+        <div className="grid grid-cols-5 gap-4 h-[calc(100vh-180px)]">
+          {COLUMNS.map(column => {
+            const columnProblems = problems.filter(p => p.status === column.id);
 
-              return (
-                <div key={column.id} className="flex flex-col">
-                  <div className={`${column.color} rounded-t-lg px-4 py-3 border-b-2 border-gray-300`}>
-                    <h2 className="font-semibold text-gray-800">
-                      {column.title}
-                      <span className="ml-2 text-sm text-gray-600">({columnProblems.length})</span>
-                    </h2>
-                  </div>
-
-                  <Droppable droppableId={column.id}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className={`flex-1 p-2 overflow-y-auto bg-white rounded-b-lg border border-gray-200 ${
-                          snapshot.isDraggingOver ? 'bg-blue-50' : ''
-                        }`}
-                      >
-                        {/* Quick Add in Backlog (Option B) */}
-                        {column.id === 'backlog' && (
-                          <div className="mb-2">
-                            <button
-                              onClick={() => setShowEditableCard(true)}
-                              className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors flex items-center justify-center gap-2"
-                            >
-                              <Plus className="w-4 h-4" />
-                              <span className="text-sm font-medium">Add Problem</span>
-                            </button>
-                          </div>
-                        )}
-
-                        {/* Editable Card (Option C) */}
-                        {column.id === 'backlog' && showEditableCard && (
-                          <EditableProblemCard
-                            onSave={handleEditableCardSave}
-                            onCancel={() => setShowEditableCard(false)}
-                          />
-                        )}
-
-                        {columnProblems.map((problem, index) => (
-                          <Draggable key={problem.id} draggableId={problem.id} index={index}>
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className={`mb-2 ${snapshot.isDragging ? 'opacity-50' : ''}`}
-                                onClick={(e) => {
-                                  if (!snapshot.isDragging) {
-                                    e.stopPropagation();
-                                    handleProblemClick(problem);
-                                  }
-                                }}
-                              >
-                                <ProblemCard
-                                  problem={problem}
-                                  tasks={getTasksForProblem(problem.id)}
-                                  onBreakdown={() => setBreakdownSidebar({
-                                    isOpen: true,
-                                    type: 'problem',
-                                    id: problem.id,
-                                    title: problem.text
-                                  })}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
+            return (
+              <div key={column.id} className="flex flex-col">
+                <div className={`${column.color} rounded-t-lg px-4 py-3 border-b-2 border-gray-300`}>
+                  <h2 className="font-semibold text-gray-800">
+                    {column.title}
+                    <span className="ml-2 text-sm text-gray-600">({columnProblems.length})</span>
+                  </h2>
                 </div>
-              );
-            })}
-          </div>
-        </DragDropContext>
-      </div>
 
-      {/* Breakdown Sidebar */}
-      <Sidebar
-        isOpen={breakdownSidebar.isOpen}
-        onClose={() => setBreakdownSidebar({ ...breakdownSidebar, isOpen: false })}
-        side="right"
-        title="AI Breakdown"
-      >
-        <BreakdownSidebarContent
-          type={breakdownSidebar.type}
-          id={breakdownSidebar.id}
-          title={breakdownSidebar.title}
-          onConfirm={handleBreakdownConfirm}
-        />
-      </Sidebar>
+                <Droppable droppableId={column.id}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`flex-1 p-2 overflow-y-auto bg-white rounded-b-lg border border-gray-200 ${
+                        snapshot.isDraggingOver ? 'bg-blue-50' : ''
+                      }`}
+                    >
+                      {columnProblems.map((problem, index) => (
+                        <Draggable key={problem.id} draggableId={problem.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`mb-2 ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                              onClick={(e) => {
+                                // Only navigate if not dragging
+                                if (!snapshot.isDragging) {
+                                  e.stopPropagation();
+                                  handleProblemClick(problem);
+                                }
+                              }}
+                            >
+                              <ProblemCard
+                                problem={problem}
+                                tasks={getTasksForProblem(problem.id)}
+                                onBreakdown={() => setBreakdownModalState({
+                                  isOpen: true,
+                                  type: 'problem',
+                                  id: problem.id,
+                                  title: problem.text
+                                })}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </div>
+            );
+          })}
+        </div>
+      </DragDropContext>
     </div>
   );
 }
