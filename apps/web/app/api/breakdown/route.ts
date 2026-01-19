@@ -32,9 +32,13 @@ function getAIClient() {
     throw new Error('No AI API key configured. Please set OPENAI_API_KEY or DEEPSEEK_API_KEY in .env.local');
   }
 
-  const baseURL = process.env.DEEPSEEK_API_KEY
-    ? 'https://api.deepseek.com'
-    : undefined;
+  // Support custom base URL
+  let baseURL = process.env.OPENAI_BASE_URL;
+
+  // Default to DeepSeek if using DeepSeek key
+  if (process.env.DEEPSEEK_API_KEY && !baseURL) {
+    baseURL = 'https://api.deepseek.com';
+  }
 
   return new OpenAI({ apiKey, baseURL });
 }

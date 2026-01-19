@@ -6,6 +6,7 @@ import { TaskCard } from './TaskCard';
 import { AddTaskModal } from './AddTaskModal';
 import { Sidebar } from './Sidebar';
 import { BreakdownSidebarContent } from './BreakdownSidebarContent';
+import { EditableTaskCard } from './EditableTaskCard';
 import { ChevronLeft, Plus } from 'lucide-react';
 
 type TaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
@@ -41,6 +42,7 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [showEditableCard, setShowEditableCard] = useState<{ [key: string]: boolean }>({});
   const [breakdownSidebar, setBreakdownSidebar] = useState<{
     isOpen: boolean;
     id: string;
@@ -106,7 +108,7 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
     }
   };
 
-  const handleAddTask = async (title: string, description: string, priority: string) => {
+  const handleAddTask = async (title: string, description: string, priority: string, status: TaskStatus = 'todo') => {
     try {
       const res = await fetch('/api/tasks', {
         method: 'POST',
@@ -116,13 +118,30 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
           parentTaskId,
           title,
           description,
-          priority
+          priority,
+          status
         })
       });
       const newTask = await res.json();
-      setTasks(prev => [...prev, newTask]);
+      setTasks(prev => [newTask, ...prev]);
     } catch (error) {
       console.error('Failed to create task:', error);
+    }
+  };
+
+  const handleEditableCardSave = async (columnId: TaskStatus, title: string, description: string, priority: string) => {
+    await handleAddTask(title, description, priority, columnId);
+    setShowEditableCard(prev => ({ ...prev, [columnId]: false }));
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await fetch(`/api/tasks?id=${taskId}`, {
+        method: 'DELETE'
+      });
+      setTasks(prev => prev.filter(t => t.id !== taskId));
+    } catch (error) {
+      console.error('Failed to delete task:', error);
     }
   };
 
@@ -224,6 +243,25 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
                         snapshot.isDraggingOver ? 'bg-blue-50' : ''
                       }`}
                     >
+                      {/* Quick Add in Every Column */}
+                      <div className="mb-2">
+                        <button
+                          onClick={() => setShowEditableCard(prev => ({ ...prev, [column.id]: true }))}
+                          className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span className="text-sm font-medium">Add to {column.title}</span>
+                        </button>
+                      </div>
+
+                      {/* Editable Card */}
+                      {showEditableCard[column.id] && (
+                        <EditableTaskCard
+                          onSave={(title, description, priority) => handleEditableCardSave(column.id, title, description, priority)}
+                          onCancel={() => setShowEditableCard(prev => ({ ...prev, [column.id]: false }))}
+                        />
+                      )}
+
                       {columnTasks.map((task, index) => (
                         <Draggable key={task.id} draggableId={task.id} index={index}>
                           {(provided, snapshot) => (
@@ -241,6 +279,7 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
                                   id: task.id,
                                   title: task.title
                                 })}
+                                onDelete={() => handleDeleteTask(task.id)}
                               />
                             </div>
                           )}

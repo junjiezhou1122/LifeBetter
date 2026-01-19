@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Check, X } from 'lucide-react';
 
-interface EditableProblemCardProps {
-  onSave: (text: string, priority: string) => void;
+interface EditableTaskCardProps {
+  onSave: (title: string, description: string, priority: string) => void;
   onCancel: () => void;
   autoFocus?: boolean;
   defaultPriority?: string;
@@ -17,20 +17,21 @@ const PRIORITY_OPTIONS = [
   { value: 'urgent', label: '🔴 Urgent', color: 'bg-red-100 text-red-700' },
 ];
 
-export function EditableProblemCard({ onSave, onCancel, autoFocus = true, defaultPriority = 'medium' }: EditableProblemCardProps) {
-  const [text, setText] = useState('');
+export function EditableTaskCard({ onSave, onCancel, autoFocus = true, defaultPriority = 'medium' }: EditableTaskCardProps) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [priority, setPriority] = useState(defaultPriority);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (autoFocus && textareaRef.current) {
-      textareaRef.current.focus();
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
     }
   }, [autoFocus]);
 
   const handleSave = () => {
-    if (text.trim()) {
-      onSave(text.trim(), priority);
+    if (title.trim()) {
+      onSave(title.trim(), description.trim(), priority);
     }
   };
 
@@ -63,15 +64,25 @@ export function EditableProblemCard({ onSave, onCancel, autoFocus = true, defaul
         ))}
       </div>
 
-      {/* Text input */}
-      <textarea
-        ref={textareaRef}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
+      {/* Title input */}
+      <input
+        ref={inputRef}
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Describe your problem... (Cmd/Ctrl+Enter to save, Esc to cancel)"
+        placeholder="Task title..."
+        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
+      />
+
+      {/* Description input */}
+      <textarea
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="Description (optional)... (Cmd/Ctrl+Enter to save, Esc to cancel)"
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
-        rows={3}
+        rows={2}
       />
 
       {/* Action buttons */}
@@ -89,7 +100,7 @@ export function EditableProblemCard({ onSave, onCancel, autoFocus = true, defaul
           </button>
           <button
             onClick={handleSave}
-            disabled={!text.trim()}
+            disabled={!title.trim()}
             className="p-2 text-white bg-orange-500 hover:bg-orange-600 rounded-md transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
             title="Save (Cmd/Ctrl+Enter)"
           >

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronRight, AlertCircle, CheckCircle2, Sparkles, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Problem {
@@ -29,6 +29,7 @@ interface ProblemCardProps {
   problem: Problem;
   tasks: Task[];
   onBreakdown?: () => void;
+  onDelete?: () => void;
 }
 
 const PRIORITY_COLORS = {
@@ -45,7 +46,7 @@ const PRIORITY_ICONS = {
   low: '🟢',
 };
 
-export function ProblemCard({ problem, tasks, onBreakdown }: ProblemCardProps) {
+export function ProblemCard({ problem, tasks, onBreakdown, onDelete }: ProblemCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   const priorityColor = PRIORITY_COLORS[problem.priority as keyof typeof PRIORITY_COLORS] || PRIORITY_COLORS.medium;
@@ -57,6 +58,13 @@ export function ProblemCard({ problem, tasks, onBreakdown }: ProblemCardProps) {
   const handleBreakdownClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onBreakdown?.();
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Delete this problem and all its tasks?')) {
+      onDelete?.();
+    }
   };
 
   return (
@@ -73,6 +81,15 @@ export function ProblemCard({ problem, tasks, onBreakdown }: ProblemCardProps) {
               {problem.text}
             </p>
           </div>
+          {onDelete && (
+            <button
+              onClick={handleDeleteClick}
+              className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors flex-shrink-0"
+              title="Delete problem"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Metadata */}

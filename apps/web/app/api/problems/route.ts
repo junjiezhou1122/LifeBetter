@@ -40,13 +40,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { text, priority = 'medium' } = await request.json();
+  const { text, priority = 'medium', status = 'backlog' } = await request.json();
   const storage = readStorage();
 
   const newProblem = {
     id: crypto.randomUUID(),
     text,
-    status: 'backlog',
+    status,
     priority,
     breakdownStatus: 'pending',
     createdAt: new Date().toISOString(),
@@ -78,4 +78,29 @@ export async function PATCH(request: Request) {
 
   writeStorage(storage);
   return NextResponse.json(storage.problems[index]);
+}
+
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json({ error: 'Problem ID required' }, { status: 400 });
+  }
+
+  const storage = readStorage();
+  const index = storage.problems.findIndex((p: any) => p.id === id);
+
+  if (index === -1) {
+    return NextResponse.json({ error: 'Problem not found' }, { status: 404 });
+  }
+
+  // Remove the problem
+  storage.problems.splice(index, 1);
+
+  // Also remove all tasks associated with this problem
+  storage.tasks = storage.tasks.filter((t: any) => t.problemId !== id);
+
+  writeStorage(storage);
+  return NextResponse.json({ success: true });
 }

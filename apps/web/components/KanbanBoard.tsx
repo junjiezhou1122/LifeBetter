@@ -61,7 +61,7 @@ export function KanbanBoard() {
   const [navigationStack, setNavigationStack] = useState<NavigationItem[]>([]);
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(true);
   const [quickAddText, setQuickAddText] = useState('');
-  const [showEditableCard, setShowEditableCard] = useState(false);
+  const [showEditableCard, setShowEditableCard] = useState<{ [key: string]: boolean }>({});
   const [breakdownSidebar, setBreakdownSidebar] = useState<{
     isOpen: boolean;
     type: 'problem' | 'task';
@@ -150,12 +150,12 @@ export function KanbanBoard() {
     setNavigationStack(prev => prev.slice(0, -1));
   };
 
-  const handleAddProblem = async (text: string, priority: string) => {
+  const handleAddProblem = async (text: string, priority: string, status: ProblemStatus = 'backlog') => {
     try {
       const res = await fetch('/api/problems', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, priority })
+        body: JSON.stringify({ text, priority, status })
       });
       const newProblem = await res.json();
       setProblems(prev => [newProblem, ...prev]);
@@ -167,14 +167,26 @@ export function KanbanBoard() {
   const handleQuickAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (quickAddText.trim()) {
-      await handleAddProblem(quickAddText.trim(), 'medium');
+      await handleAddProblem(quickAddText.trim(), 'medium', 'backlog');
       setQuickAddText('');
     }
   };
 
-  const handleEditableCardSave = async (text: string, priority: string) => {
-    await handleAddProblem(text, priority);
-    setShowEditableCard(false);
+  const handleEditableCardSave = async (columnId: ProblemStatus, text: string, priority: string) => {
+    await handleAddProblem(text, priority, columnId);
+    setShowEditableCard(prev => ({ ...prev, [columnId]: false }));
+  };
+
+  const handleDeleteProblem = async (problemId: string) => {
+    try {
+      await fetch(`/api/problems?id=${problemId}`, {
+        method: 'DELETE'
+      });
+      setProblems(prev => prev.filter(p => p.id !== problemId));
+      setTasks(prev => prev.filter(t => t.problemId !== problemId));
+    } catch (error) {
+      console.error('Failed to delete problem:', error);
+    }
   };
 
   const handleBreakdownConfirm = async () => {
@@ -287,24 +299,22 @@ export function KanbanBoard() {
                           snapshot.isDraggingOver ? 'bg-blue-50' : ''
                         }`}
                       >
-                        {/* Quick Add in Backlog (Option B) */}
-                        {column.id === 'backlog' && (
-                          <div className="mb-2">
-                            <button
-                              onClick={() => setShowEditableCard(true)}
-                              className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors flex items-center justify-center gap-2"
-                            >
-                              <Plus className="w-4 h-4" />
-                              <span className="text-sm font-medium">Add Problem</span>
-                            </button>
-                          </div>
-                        )}
+                        {/* Quick Add in Every Column */}
+                        <div className="mb-2">
+                          <button
+                            onClick={() => setShowEditableCard(prev => ({ ...prev, [column.id]: true }))}
+                            className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <Plus className="w-4 h-4" />
+                            <span className="text-sm font-medium">Add to {column.title}</span>
+                          </button>
+                        </div>
 
-                        {/* Editable Card (Option C) */}
-                        {column.id === 'backlog' && showEditableCard && (
+                        {/* Editable Card */}
+                        {showEditableCard[column.id] && (
                           <EditableProblemCard
-                            onSave={handleEditableCardSave}
-                            onCancel={() => setShowEditableCard(false)}
+                            onSave={(text, priority) => handleEditableCardSave(column.id, text, priority)}
+                            onCancel={() => setShowEditableCard(prev => ({ ...prev, [column.id]: false }))}
                           />
                         )}
 
@@ -332,6 +342,7 @@ export function KanbanBoard() {
                                     id: problem.id,
                                     title: problem.text
                                   })}
+                                  onDelete={() => handleDeleteProblem(problem.id)}
                                 />
                               </div>
                             )}

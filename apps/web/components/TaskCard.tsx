@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
+import { AlertCircle, ChevronRight, Sparkles, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Task {
@@ -22,6 +22,7 @@ interface TaskCardProps {
   task: Task;
   onClick: () => void;
   onBreakdown?: () => void;
+  onDelete?: () => void;
 }
 
 const PRIORITY_COLORS = {
@@ -38,13 +39,20 @@ const PRIORITY_ICONS = {
   low: '🟢',
 };
 
-export function TaskCard({ task, onClick, onBreakdown }: TaskCardProps) {
+export function TaskCard({ task, onClick, onBreakdown, onDelete }: TaskCardProps) {
   const priorityColor = PRIORITY_COLORS[task.priority as keyof typeof PRIORITY_COLORS] || PRIORITY_COLORS.medium;
   const priorityIcon = PRIORITY_ICONS[task.priority as keyof typeof PRIORITY_ICONS] || PRIORITY_ICONS.medium;
 
   const handleBreakdownClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onBreakdown?.();
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm('Delete this task and all its subtasks?')) {
+      onDelete?.();
+    }
   };
 
   return (
@@ -64,9 +72,20 @@ export function TaskCard({ task, onClick, onBreakdown }: TaskCardProps) {
               {task.title}
             </p>
           </div>
-          {task.canBreakdown !== false && (
-            <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-          )}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {task.canBreakdown !== false && (
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+            )}
+            {onDelete && (
+              <button
+                onClick={handleDeleteClick}
+                className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                title="Delete task"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Description */}

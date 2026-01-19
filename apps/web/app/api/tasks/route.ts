@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { problemId, parentTaskId, title, description, priority = 'medium' } = await request.json();
+  const { problemId, parentTaskId, title, description, priority = 'medium', status = 'todo' } = await request.json();
   const storage = readStorage();
 
   const newTask = {
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     parentTaskId: parentTaskId || null,
     title,
     description: description || '',
-    status: 'todo',
+    status,
     priority,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -87,4 +87,37 @@ export async function PATCH(request: Request) {
 
   writeStorage(storage);
   return NextResponse.json(storage.tasks[index]);
+}
+
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json({ error: 'Task ID required' }, { status: 400 });
+  }
+
+  const storage = readStorage();
+  const index = storage.tasks.findIndex((t: any) => t.id === id);
+
+  if (index === -1) {
+    return NextResponse.json({ error: 'Task not found' }, { status: 404 });
+  }
+
+  // Remove the task
+  storage.tasks.splice(index, 1);
+
+  // Also remove all subtasks
+  function removeSubtasks(taskId: string) {
+    const subtasks = storage.tasks.filter((t: any) => t.parentTaskId === taskId);
+    subtasks.forEach((subtask: any) => {
+      removeSubtasks(subtask.id);
+      const idx = storage.tasks.findIndex((t: any) => t.id === subtask.id);
+      if (idx !== -1) storage.tasks.splice(idx, 1);
+    });
+  }
+  removeSubtasks(id);
+
+  writeStorage(storage);
+  return NextResponse.json({ success: true });
 }
