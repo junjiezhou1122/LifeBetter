@@ -56,7 +56,9 @@ export async function POST(request: Request) {
 
   try {
     const client = getAIClient();
-    const model = process.env.DEEPSEEK_API_KEY ? 'deepseek-chat' : 'gpt-4o-mini';
+    // Allow custom model configuration, with smart defaults
+    const model = process.env.OPENAI_MODEL ||
+                  (process.env.DEEPSEEK_API_KEY ? 'deepseek-chat' : 'gpt-4o-mini');
 
     let prompt = '';
     if (type === 'problem') {
@@ -105,37 +107,9 @@ Return a JSON array of subtasks with this structure:
     const cleanedContent = cleanJsonResponse(content);
     const suggestedTasks = JSON.parse(cleanedContent);
 
-    // Create the tasks in storage
-    const storage = readStorage();
-    const newTasks = suggestedTasks.map((task: any) => ({
-      id: crypto.randomUUID(),
-      problemId: type === 'problem' ? id : storage.tasks.find((t: any) => t.id === id)?.problemId,
-      parentTaskId: type === 'task' ? id : null,
-      title: task.title,
-      description: task.description || '',
-      status: 'todo',
-      priority: task.priority || 'medium',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      blockedBy: [],
-      blocking: [],
-      canBreakdown: true
-    }));
-
-    storage.tasks.push(...newTasks);
-
-    // Update breakdown status
-    if (type === 'problem') {
-      const problemIndex = storage.problems.findIndex((p: any) => p.id === id);
-      if (problemIndex !== -1) {
-        storage.problems[problemIndex].breakdownStatus = 'completed';
-        storage.problems[problemIndex].updatedAt = new Date().toISOString();
-      }
-    }
-
-    writeStorage(storage);
-
-    return NextResponse.json({ tasks: newTasks });
+    // Return the suggested tasks without creating them
+    // The frontend will handle task creation based on user selection
+    return NextResponse.json({ tasks: suggestedTasks });
   } catch (error) {
     console.error('AI breakdown failed:', error);
     return NextResponse.json(

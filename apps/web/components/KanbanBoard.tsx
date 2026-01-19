@@ -190,7 +190,7 @@ export function KanbanBoard() {
   };
 
   const handleBreakdownConfirm = async () => {
-    // Tasks are already created by the API, just refresh the tasks list
+    // Tasks are created by the BreakdownSidebarContent, just refresh the tasks list
     try {
       const res = await fetch('/api/tasks');
       const tasksData = await res.json();

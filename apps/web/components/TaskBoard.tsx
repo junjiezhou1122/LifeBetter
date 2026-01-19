@@ -146,7 +146,7 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
   };
 
   const handleBreakdownConfirm = async () => {
-    // Tasks are already created by the API, just refresh the tasks list
+    // Tasks are created by the BreakdownSidebarContent, just refresh the tasks list
     try {
       const url = parentTaskId
         ? `/api/tasks?parentTaskId=${parentTaskId}`
@@ -216,6 +216,7 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
           type="task"
           id={breakdownSidebar.id}
           title={breakdownSidebar.title}
+          problemId={problemId}
           onConfirm={handleBreakdownConfirm}
         />
       </Sidebar>

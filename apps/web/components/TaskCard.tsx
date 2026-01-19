@@ -50,9 +50,14 @@ export function TaskCard({ task, onClick, onBreakdown, onDelete }: TaskCardProps
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (confirm('Delete this task and all its subtasks?')) {
       onDelete?.();
     }
+  };
+
+  const preventDrag = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   return (
@@ -79,6 +84,8 @@ export function TaskCard({ task, onClick, onBreakdown, onDelete }: TaskCardProps
             {onDelete && (
               <button
                 onClick={handleDeleteClick}
+                onMouseDown={preventDrag}
+                onTouchStart={preventDrag}
                 className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                 title="Delete task"
               >

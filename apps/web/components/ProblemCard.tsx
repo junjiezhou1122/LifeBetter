@@ -62,9 +62,14 @@ export function ProblemCard({ problem, tasks, onBreakdown, onDelete }: ProblemCa
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     if (confirm('Delete this problem and all its tasks?')) {
       onDelete?.();
     }
+  };
+
+  const preventDrag = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   return (
@@ -84,6 +89,8 @@ export function ProblemCard({ problem, tasks, onBreakdown, onDelete }: ProblemCa
           {onDelete && (
             <button
               onClick={handleDeleteClick}
+              onMouseDown={preventDrag}
+              onTouchStart={preventDrag}
               className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors flex-shrink-0"
               title="Delete problem"
             >
