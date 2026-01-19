@@ -2,6 +2,8 @@ import { getAllProblems, getTodayProblems, getProblemsInRange } from '../storage
 import { isAIEnabled } from '../config.js';
 import { getAIProvider } from '../ai/index.js';
 import type { ReviewOptions } from '../types.js';
+import * as ui from '../ui.js';
+import chalk from 'chalk';
 
 export async function reviewCommand(args: string[]): Promise<void> {
   try {
@@ -52,58 +54,49 @@ export async function reviewCommand(args: string[]): Promise<void> {
     }
 
     if (problems.length === 0) {
-      console.log('No problems found for the specified criteria');
+      ui.warning('No problems found for the specified criteria');
       return;
     }
 
-    console.log(`\n📊 Analyzing ${problems.length} problem${problems.length === 1 ? '' : 's'}...\n`);
+    ui.header(`📊 Analyzing ${problems.length} Problem${problems.length === 1 ? '' : 's'}`, '🔍');
 
     // Check if AI is enabled
     if (!isAIEnabled()) {
-      console.log('⚠️  AI features are not enabled.');
-      console.log('Run: lb config setup\n');
+      ui.warning('AI features are not enabled');
+      console.log(chalk.gray('Run: ') + chalk.cyan('lb config setup') + '\n');
       return;
     }
 
-    // Get AI analysis
+    // Get AI analysis with spinner
+    const loadingSpinner = ui.spinner('Analyzing patterns...');
+    loadingSpinner.start();
+
     const provider = getAIProvider();
     const result = await provider.review(problems, options);
 
+    loadingSpinner.stop();
+
     // Display patterns
     if (result.patterns.length > 0) {
-      console.log('🔍 Patterns Detected:\n');
-      result.patterns.forEach((pattern, i) => {
-        console.log(`   ${i + 1}. ${pattern.name} (${pattern.count} problem${pattern.count === 1 ? '' : 's'})`);
-        console.log(`      ${pattern.description}\n`);
-      });
+      ui.header('Patterns Detected', '🔍');
+      ui.patternsTable(result.patterns);
+      console.log('');
     }
 
     // Display suggestions
     if (result.suggestions.length > 0) {
-      console.log('💡 Suggestions:\n');
-      result.suggestions.forEach((suggestion, i) => {
-        console.log(`   ${i + 1}. ${suggestion}`);
-      });
-      console.log('');
+      ui.header('Suggestions', '💡');
+      ui.suggestions(result.suggestions);
     }
 
     // Display resources
     if (result.resources.length > 0) {
-      console.log('📚 Resources:\n');
-      result.resources.forEach((resource, i) => {
-        console.log(`   ${i + 1}. ${resource.title}`);
-        if (resource.url !== '#') {
-          console.log(`      ${resource.url}`);
-        }
-        if (resource.description) {
-          console.log(`      ${resource.description}`);
-        }
-        console.log('');
-      });
+      ui.header('Resources', '📚');
+      ui.resources(result.resources);
     }
 
   } catch (error) {
-    console.error('Error:', (error as Error).message);
+    ui.error((error as Error).message);
     process.exit(1);
   }
 }

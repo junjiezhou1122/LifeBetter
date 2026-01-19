@@ -2,13 +2,15 @@ import { getTodayProblems, getProblemsInRange } from '../storage.js';
 import { isAIEnabled } from '../config.js';
 import { getAIProvider } from '../ai/index.js';
 import type { Problem } from '../types.js';
+import * as ui from '../ui.js';
+import chalk from 'chalk';
 
 export async function summaryCommand(args: string[]): Promise<void> {
   try {
     const period = args[0] || 'daily';
 
     if (!['daily', 'weekly', 'monthly'].includes(period)) {
-      console.error('Error: Invalid period. Use: daily, weekly, or monthly');
+      ui.error('Invalid period. Use: daily, weekly, or monthly');
       process.exit(1);
     }
 
@@ -29,84 +31,87 @@ export async function summaryCommand(args: string[]): Promise<void> {
     }
 
     if (problems.length === 0) {
-      console.log(`\nNo problems logged in the ${period} period\n`);
+      ui.warning(`No problems logged in the ${period} period`);
       return;
     }
 
     const periodLabel = period === 'daily' ? 'Daily' : period === 'weekly' ? 'Weekly' : 'Monthly';
     const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-    console.log(`\n📅 ${periodLabel} Summary - ${dateStr}\n`);
+    ui.header(`${periodLabel} Summary - ${dateStr}`, '📅');
 
     // Check if AI is enabled
     if (!isAIEnabled()) {
-      console.log('⚠️  AI features are not enabled.');
-      console.log('Run: lb config setup\n');
+      ui.warning('AI features are not enabled');
+      console.log(chalk.gray('Run: ') + chalk.cyan('lb config setup') + '\n');
 
       // Show basic stats without AI
-      console.log(`📊 Overview:\n`);
-      console.log(`   • ${problems.length} problem${problems.length === 1 ? '' : 's'} logged\n`);
+      ui.summaryBox('Overview', [
+        { label: 'Problems logged', value: problems.length }
+      ]);
       return;
     }
 
-    // Get AI summary
+    // Get AI summary with spinner
+    const loadingSpinner = ui.spinner('Generating summary...');
+    loadingSpinner.start();
+
     const provider = getAIProvider();
     const summary = await provider.summarize(problems, period as 'daily' | 'weekly' | 'monthly');
 
+    loadingSpinner.stop();
+
     // Display overview
-    console.log('📊 Overview:\n');
-    console.log(`   • ${summary.overview.totalProblems} problem${summary.overview.totalProblems === 1 ? '' : 's'} logged`);
+    const overviewStats: Array<{ label: string; value: string | number | undefined }> = [
+      { label: 'Total problems', value: summary.overview.totalProblems }
+    ];
 
     if (Object.keys(summary.overview.categories).length > 0) {
-      console.log('   • Categories:');
-      Object.entries(summary.overview.categories).forEach(([category, count]) => {
-        console.log(`     - ${category}: ${count}`);
-      });
+      overviewStats.push({ label: 'Categories', value: Object.keys(summary.overview.categories).length });
     }
 
     if (summary.overview.mostActiveTime) {
-      console.log(`   • Most active: ${summary.overview.mostActiveTime}`);
+      overviewStats.push({ label: 'Most active', value: summary.overview.mostActiveTime });
     }
-    console.log('');
+
+    ui.summaryBox('📊 Overview', overviewStats);
+
+    // Display categories breakdown
+    if (Object.keys(summary.overview.categories).length > 0) {
+      console.log(chalk.bold.cyan('Categories Breakdown:'));
+      Object.entries(summary.overview.categories).forEach(([category, count]) => {
+        console.log(chalk.gray('  •') + ' ' + chalk.white(category) + chalk.gray(': ') + chalk.yellow(count.toString()));
+      });
+      console.log('');
+    }
 
     // Display patterns
     if (summary.patterns.length > 0) {
-      console.log('🔥 Top Patterns:\n');
-      summary.patterns.forEach((pattern, i) => {
-        console.log(`   ${i + 1}. ${pattern.name} (${pattern.count} problem${pattern.count === 1 ? '' : 's'})`);
-        console.log(`      ${pattern.description}\n`);
-      });
+      ui.header('Top Patterns', '🔥');
+      ui.patternsTable(summary.patterns);
+      console.log('');
     }
 
     // Display trends
     if (summary.trends.length > 0) {
-      console.log('📈 Trends:\n');
-      summary.trends.forEach((trend, i) => {
-        console.log(`   • ${trend}`);
-      });
-      console.log('');
+      ui.header('Trends', '📈');
+      ui.trends(summary.trends);
     }
 
     // Display meta-learning insights
     if (summary.metaLearning.length > 0) {
-      console.log('💪 Meta-Learning Insights:\n');
-      summary.metaLearning.forEach((insight, i) => {
-        console.log(`   • ${insight}`);
-      });
-      console.log('');
+      ui.header('Meta-Learning Insights', '💪');
+      ui.trends(summary.metaLearning);
     }
 
     // Display recommendations
     if (summary.recommendations.length > 0) {
-      console.log('🎯 Recommendations:\n');
-      summary.recommendations.forEach((rec, i) => {
-        console.log(`   ${i + 1}. ${rec}`);
-      });
-      console.log('');
+      ui.header('Recommendations', '🎯');
+      ui.suggestions(summary.recommendations);
     }
 
   } catch (error) {
-    console.error('Error:', (error as Error).message);
+    ui.error((error as Error).message);
     process.exit(1);
   }
 }

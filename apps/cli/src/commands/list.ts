@@ -1,25 +1,26 @@
 import { getAllProblems, formatTimeAgo } from '../storage.js';
+import * as ui from '../ui.js';
+import chalk from 'chalk';
 
 export function listCommand(): void {
   try {
     const problems = getAllProblems();
 
     if (problems.length === 0) {
-      console.log('No problems logged yet');
-      console.log('Try: lb p "Your first problem"');
+      ui.info('No problems logged yet');
+      console.log(chalk.gray('Try: ') + chalk.cyan('lb p "Your first problem"'));
       return;
     }
 
-    console.log(`${problems.length} problem${problems.length === 1 ? '' : 's'} total\n`);
+    ui.header(`📋 ${problems.length} Problem${problems.length === 1 ? '' : 's'} Total`);
 
     problems.forEach((problem, index) => {
       const num = problems.length - index;
       const timeAgo = formatTimeAgo(problem.createdAt);
-      console.log(`[${num}] ${timeAgo}`);
-      console.log(`    ${problem.text}\n`);
+      ui.problem(num, timeAgo, problem.text);
     });
   } catch (error) {
-    console.error('Error:', (error as Error).message);
+    ui.error((error as Error).message);
     process.exit(1);
   }
 }

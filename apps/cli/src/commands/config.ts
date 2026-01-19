@@ -1,5 +1,7 @@
 import prompts from 'prompts';
 import { readConfig, writeConfig, maskApiKey, type Config } from '../config.js';
+import * as ui from '../ui.js';
+import chalk from 'chalk';
 
 export async function configCommand(args: string[]): Promise<void> {
   const subcommand = args[0];
@@ -11,11 +13,11 @@ export async function configCommand(args: string[]): Promise<void> {
   } else if (subcommand === 'setup') {
     await setupWizard();
   } else {
-    console.error(`Unknown config command: ${subcommand}`);
-    console.error('Usage:');
-    console.error('  lb config show          Show current configuration');
-    console.error('  lb config set <key> <value>   Set a configuration value');
-    console.error('  lb config setup         Run interactive setup wizard');
+    ui.error(`Unknown config command: ${subcommand}`);
+    console.log('Usage:');
+    console.log('  lb config show          Show current configuration');
+    console.log('  lb config set <key> <value>   Set a configuration value');
+    console.log('  lb config setup         Run interactive setup wizard');
     process.exit(1);
   }
 }
@@ -23,26 +25,29 @@ export async function configCommand(args: string[]): Promise<void> {
 function showConfig(): void {
   const config = readConfig();
 
-  console.log('\n📋 LifeBetter Configuration\n');
-  console.log(`AI Provider:       ${config.aiProvider}`);
-  console.log(`API Base URL:      ${config.apiBaseUrl || 'default'}`);
-  console.log(`API Key:           ${config.apiKey ? maskApiKey(config.apiKey) : 'not set'}`);
-  console.log(`AI Model:          ${config.aiModel}`);
-  console.log(`AI Enabled:        ${config.aiEnabled ? 'yes' : 'no'}`);
-  console.log(`Instant Analysis:  ${config.instantAnalysis ? 'yes' : 'no'}`);
-  console.log(`Cache Enabled:     ${config.cacheEnabled ? 'yes' : 'no'}`);
-  console.log(`Max Tokens:        ${config.maxTokensPerRequest || 'default'}`);
-  console.log(`Rate Limit:        ${config.rateLimitPerMinute || 'default'} calls/min\n`);
+  ui.header('LifeBetter Configuration', '⚙️');
+
+  ui.configDisplay({
+    'AI Provider': config.aiProvider,
+    'API Base URL': config.apiBaseUrl || 'default',
+    'API Key': config.apiKey ? maskApiKey(config.apiKey) : 'not set',
+    'AI Model': config.aiModel,
+    'AI Enabled': config.aiEnabled ? 'yes' : 'no',
+    'Instant Analysis': config.instantAnalysis ? 'yes' : 'no',
+    'Cache Enabled': config.cacheEnabled ? 'yes' : 'no',
+    'Max Tokens': config.maxTokensPerRequest?.toString() || 'default',
+    'Rate Limit': `${config.rateLimitPerMinute || 'default'} calls/min`
+  });
 }
 
 async function setConfig(args: string[]): Promise<void> {
   if (args.length < 2) {
-    console.error('Error: Missing key or value');
-    console.error('Usage: lb config set <key> <value>');
-    console.error('\nAvailable keys:');
-    console.error('  ai-provider, api-key, api-base-url, ai-model');
-    console.error('  ai-enabled, instant-analysis, cache-enabled');
-    console.error('  max-tokens, rate-limit');
+    ui.error('Missing key or value');
+    console.log('Usage: lb config set <key> <value>');
+    console.log('\nAvailable keys:');
+    console.log('  ai-provider, api-key, api-base-url, ai-model');
+    console.log('  ai-enabled, instant-analysis, cache-enabled');
+    console.log('  max-tokens, rate-limit');
     process.exit(1);
   }
 
@@ -53,7 +58,7 @@ async function setConfig(args: string[]): Promise<void> {
   switch (key) {
     case 'ai-provider':
       if (!['openai', 'anthropic', 'ollama', 'custom'].includes(value)) {
-        console.error('Error: Invalid provider. Must be: openai, anthropic, ollama, or custom');
+        ui.error('Invalid provider. Must be: openai, anthropic, ollama, or custom');
         process.exit(1);
       }
       config.aiProvider = value as Config['aiProvider'];
@@ -92,16 +97,16 @@ async function setConfig(args: string[]): Promise<void> {
       break;
 
     default:
-      console.error(`Error: Unknown config key: ${key}`);
+      ui.error(`Unknown config key: ${key}`);
       process.exit(1);
   }
 
   writeConfig(config);
-  console.log(`✓ Configuration updated: ${key} = ${key === 'api-key' ? maskApiKey(value) : value}`);
+  ui.success(`Configuration updated: ${key} = ${key === 'api-key' ? maskApiKey(value) : value}`);
 }
 
 async function setupWizard(): Promise<void> {
-  console.log('\n🚀 LifeBetter AI Configuration Setup\n');
+  ui.header('LifeBetter AI Configuration Setup', '🚀');
 
   const responses = await prompts([
     {
@@ -153,7 +158,7 @@ async function setupWizard(): Promise<void> {
   ]);
 
   if (Object.keys(responses).length === 0) {
-    console.log('\nSetup cancelled');
+    ui.warning('Setup cancelled');
     return;
   }
 
@@ -168,9 +173,9 @@ async function setupWizard(): Promise<void> {
 
   writeConfig(config);
 
-  console.log('\n✓ Configuration saved!\n');
-  console.log('You can now use AI features:');
-  console.log('  lb p "problem"     - Log with instant AI analysis');
-  console.log('  lb review          - Review your problems');
-  console.log('  lb summary         - Get daily summary\n');
+  ui.success('Configuration saved!');
+  console.log('\nYou can now use AI features:');
+  console.log(chalk.cyan('  lb p "problem"') + chalk.gray('     - Log with instant AI analysis'));
+  console.log(chalk.cyan('  lb review') + chalk.gray('          - Review your problems'));
+  console.log(chalk.cyan('  lb summary') + chalk.gray('         - Get daily summary\n'));
 }
