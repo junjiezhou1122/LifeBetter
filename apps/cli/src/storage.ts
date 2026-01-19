@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { randomUUID } from 'crypto';
-import type { Problem, Storage } from './types.js';
+import type { Problem, Storage, Task, Notification } from './types.js';
 
 /**
  * Get the path to the storage file
@@ -36,7 +36,11 @@ export function ensureStorageExists(): void {
 
     // Create empty storage file if it doesn't exist
     if (!fs.existsSync(storagePath)) {
-      const emptyStorage: Storage = { problems: [] };
+      const emptyStorage: Storage = {
+        problems: [],
+        tasks: [],
+        notifications: []
+      };
       fs.writeFileSync(storagePath, JSON.stringify(emptyStorage, null, 2), 'utf-8');
     }
   } catch (error) {
@@ -56,16 +60,24 @@ export function readStorage(): Storage {
     const data = fs.readFileSync(storagePath, 'utf-8');
     const storage = JSON.parse(data) as Storage;
 
-    // Validate structure
+    // Validate structure and migrate old format
     if (!storage.problems || !Array.isArray(storage.problems)) {
       throw new Error('Invalid storage format');
     }
+
+    // Ensure new fields exist (migration)
+    if (!storage.tasks) storage.tasks = [];
+    if (!storage.notifications) storage.notifications = [];
 
     return storage;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       // File doesn't exist, return empty storage
-      return { problems: [] };
+      return {
+        problems: [],
+        tasks: [],
+        notifications: []
+      };
     }
 
     // JSON parse error or other error
@@ -106,6 +118,10 @@ export function addProblem(text: string): Problem {
     id: randomUUID(),
     text: text,
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: 'backlog',
+    priority: 'medium',
+    breakdownStatus: 'pending',
   };
 
   storage.problems.push(problem);
@@ -242,3 +258,295 @@ export function getProblemById(id: string): Problem | null {
   const storage = readStorage();
   return storage.problems.find(p => p.id === id) || null;
 }
+
+// ============================================================================
+// TASK MANAGEMENT
+// ============================================================================
+
+/**
+ * Create a new task
+ */
+export function createTask(
+  problemId: string,
+  title: string,
+  description?: string,
+  parentTaskId?: string
+): Task {
+  const storage = readStorage();
+
+  const task: Task = {
+    id: randomUUID(),
+    problemId,
+    parentTaskId,
+    title,
+    description,
+    status: 'todo',
+    priority: 'medium',
+    order: storage.tasks.filter(t => t.problemId === problemId).length,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    canBreakdown: true,
+  };
+
+  storage.tasks.push(task);
+  writeStorage(storage);
+
+  return task;
+}
+
+/**
+ * Get all tasks for a problem
+ */
+export function getTasksForProblem(problemId: string): Task[] {
+  const storage = readStorage();
+  return storage.tasks
+    .filter(t => t.problemId === problemId && !t.parentTaskId)
+    .sort((a, b) => a.order - b.order);
+}
+
+/**
+ * Get subtasks for a task
+ */
+export function getSubtasks(taskId: string): Task[] {
+  const storage = readStorage();
+  return storage.tasks
+    .filter(t => t.parentTaskId === taskId)
+    .sort((a, b) => a.order - b.order);
+}
+
+/**
+ * Get task by ID
+ */
+export function getTaskById(id: string): Task | null {
+  const storage = readStorage();
+  return storage.tasks.find(t => t.id === id) || null;
+}
+
+/**
+ * Update task
+ */
+export function updateTask(id: string, updates: Partial<Task>): Task | null {
+  const storage = readStorage();
+  const index = storage.tasks.findIndex(t => t.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  storage.tasks[index] = {
+    ...storage.tasks[index],
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  };
+  writeStorage(storage);
+
+  return storage.tasks[index];
+}
+
+/**
+ * Delete task
+ */
+export function deleteTask(id: string): Task | null {
+  const storage = readStorage();
+  const index = storage.tasks.findIndex(t => t.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const deleted = storage.tasks[index];
+
+  // Also delete all subtasks
+  storage.tasks = storage.tasks.filter(t => t.id !== id && t.parentTaskId !== id);
+
+  writeStorage(storage);
+  return deleted;
+}
+
+/**
+ * Get all tasks
+ */
+export function getAllTasks(): Task[] {
+  const storage = readStorage();
+  return storage.tasks;
+}
+
+// ============================================================================
+// NOTIFICATION MANAGEMENT
+// ============================================================================
+
+/**
+ * Create notification
+ */
+export function createNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'read'>): Notification {
+  const storage = readStorage();
+
+  const newNotification: Notification = {
+    ...notification,
+    id: randomUUID(),
+    read: false,
+    createdAt: new Date().toISOString(),
+  };
+
+  storage.notifications.push(newNotification);
+  writeStorage(storage);
+
+  return newNotification;
+}
+
+/**
+ * Get all notifications
+ */
+export function getAllNotifications(unreadOnly: boolean = false): Notification[] {
+  const storage = readStorage();
+  const notifications = storage.notifications.sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  if (unreadOnly) {
+    return notifications.filter(n => !n.read);
+  }
+
+  return notifications;
+}
+
+/**
+ * Mark notification as read
+ */
+export function markNotificationRead(id: string): Notification | null {
+  const storage = readStorage();
+  const index = storage.notifications.findIndex(n => n.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  storage.notifications[index].read = true;
+  writeStorage(storage);
+
+  return storage.notifications[index];
+}
+
+/**
+ * Mark all notifications as read
+ */
+export function markAllNotificationsRead(): void {
+  const storage = readStorage();
+  storage.notifications.forEach(n => n.read = true);
+  writeStorage(storage);
+}
+
+/**
+ * Delete notification
+ */
+export function deleteNotification(id: string): Notification | null {
+  const storage = readStorage();
+  const index = storage.notifications.findIndex(n => n.id === id);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const deleted = storage.notifications[index];
+  storage.notifications.splice(index, 1);
+  writeStorage(storage);
+
+  return deleted;
+}
+
+// ============================================================================
+// BLOCKING RELATIONSHIPS
+// ============================================================================
+
+/**
+ * Add blocking relationship
+ */
+export function addBlocker(blockedId: string, blockerId: string): void {
+  const storage = readStorage();
+
+  // Find if it's a problem or task
+  const problem = storage.problems.find(p => p.id === blockedId);
+  const task = storage.tasks.find(t => t.id === blockedId);
+
+  if (problem) {
+    if (!problem.blockedBy) problem.blockedBy = [];
+    if (!problem.blockedBy.includes(blockerId)) {
+      problem.blockedBy.push(blockerId);
+    }
+  } else if (task) {
+    if (!task.blockedBy) task.blockedBy = [];
+    if (!task.blockedBy.includes(blockerId)) {
+      task.blockedBy.push(blockerId);
+    }
+  }
+
+  // Update blocker's blocking list
+  const blockerProblem = storage.problems.find(p => p.id === blockerId);
+  const blockerTask = storage.tasks.find(t => t.id === blockerId);
+
+  if (blockerProblem) {
+    if (!blockerProblem.blocking) blockerProblem.blocking = [];
+    if (!blockerProblem.blocking.includes(blockedId)) {
+      blockerProblem.blocking.push(blockedId);
+    }
+  } else if (blockerTask) {
+    if (!blockerTask.blocking) blockerTask.blocking = [];
+    if (!blockerTask.blocking.includes(blockedId)) {
+      blockerTask.blocking.push(blockedId);
+    }
+  }
+
+  writeStorage(storage);
+}
+
+/**
+ * Remove blocking relationship
+ */
+export function removeBlocker(blockedId: string, blockerId: string): void {
+  const storage = readStorage();
+
+  // Remove from blocked item
+  const problem = storage.problems.find(p => p.id === blockedId);
+  const task = storage.tasks.find(t => t.id === blockedId);
+
+  if (problem && problem.blockedBy) {
+    problem.blockedBy = problem.blockedBy.filter(id => id !== blockerId);
+  } else if (task && task.blockedBy) {
+    task.blockedBy = task.blockedBy.filter(id => id !== blockerId);
+  }
+
+  // Remove from blocker item
+  const blockerProblem = storage.problems.find(p => p.id === blockerId);
+  const blockerTask = storage.tasks.find(t => t.id === blockerId);
+
+  if (blockerProblem && blockerProblem.blocking) {
+    blockerProblem.blocking = blockerProblem.blocking.filter(id => id !== blockedId);
+  } else if (blockerTask && blockerTask.blocking) {
+    blockerTask.blocking = blockerTask.blocking.filter(id => id !== blockedId);
+  }
+
+  writeStorage(storage);
+}
+
+/**
+ * Get all blocked items
+ */
+export function getBlockedItems(): Array<Problem | Task> {
+  const storage = readStorage();
+  const blocked: Array<Problem | Task> = [];
+
+  storage.problems.forEach(p => {
+    if (p.blockedBy && p.blockedBy.length > 0) {
+      blocked.push(p);
+    }
+  });
+
+  storage.tasks.forEach(t => {
+    if (t.blockedBy && t.blockedBy.length > 0) {
+      blocked.push(t);
+    }
+  });
+
+  return blocked;
+}
+
