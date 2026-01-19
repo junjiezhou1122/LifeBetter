@@ -3,32 +3,56 @@ import boxen from 'boxen';
 import ora from 'ora';
 import Table from 'cli-table3';
 
+// Modern color palette - softer, more professional
+const colors = {
+  // Primary colors
+  primary: chalk.hex('#6366f1'),      // Indigo - main brand color
+  secondary: chalk.hex('#8b5cf6'),    // Purple - secondary actions
+  accent: chalk.hex('#06b6d4'),       // Cyan - highlights
+
+  // Status colors
+  success: chalk.hex('#10b981'),      // Emerald green
+  error: chalk.hex('#ef4444'),        // Red
+  warning: chalk.hex('#f59e0b'),      // Amber
+  info: chalk.hex('#3b82f6'),         // Blue
+
+  // Text colors
+  text: chalk.hex('#e5e7eb'),         // Light gray - main text
+  textDim: chalk.hex('#9ca3af'),      // Gray - secondary text
+  textBright: chalk.hex('#f9fafb'),   // Almost white - emphasis
+
+  // Special
+  ai: chalk.hex('#a78bfa'),           // Light purple - AI content
+  link: chalk.hex('#60a5fa'),         // Light blue - links
+  number: chalk.hex('#fbbf24'),       // Yellow - numbers/counts
+};
+
 /**
  * Display a success message
  */
 export function success(message: string): void {
-  console.log(chalk.green('✓') + ' ' + chalk.white(message));
+  console.log(colors.success('✓') + ' ' + colors.text(message));
 }
 
 /**
  * Display an error message
  */
 export function error(message: string): void {
-  console.log(chalk.red('✗') + ' ' + chalk.white(message));
+  console.log(colors.error('✗') + ' ' + colors.text(message));
 }
 
 /**
  * Display a warning message
  */
 export function warning(message: string): void {
-  console.log(chalk.yellow('⚠') + ' ' + chalk.white(message));
+  console.log(colors.warning('⚠') + ' ' + colors.text(message));
 }
 
 /**
  * Display an info message
  */
 export function info(message: string): void {
-  console.log(chalk.blue('ℹ') + ' ' + chalk.white(message));
+  console.log(colors.info('ℹ') + ' ' + colors.text(message));
 }
 
 /**
@@ -36,23 +60,23 @@ export function info(message: string): void {
  */
 export function header(text: string, icon?: string): void {
   const displayText = icon ? `${icon} ${text}` : text;
-  console.log('\n' + chalk.bold.cyan(displayText) + '\n');
+  console.log('\n' + colors.primary.bold(displayText) + '\n');
 }
 
 /**
  * Display AI insight in a beautiful box
  */
 export function aiInsight(summary: string, solutions: string[], relatedCount: number): void {
-  let content = chalk.white(summary);
+  let content = colors.text(summary);
 
   if (relatedCount > 0) {
-    content += '\n\n' + chalk.gray(`🔗 Related problems: ${relatedCount} found`);
+    content += '\n\n' + colors.textDim(`🔗 Related problems: `) + colors.number(`${relatedCount}`) + colors.textDim(' found');
   }
 
   if (solutions.length > 0) {
-    content += '\n\n' + chalk.bold('💡 Suggested Solutions:');
+    content += '\n\n' + colors.ai.bold('💡 Suggested Solutions:');
     solutions.forEach((solution, i) => {
-      content += '\n' + chalk.cyan(`  ${i + 1}.`) + ' ' + chalk.white(solution);
+      content += '\n' + colors.number(`  ${i + 1}.`) + ' ' + colors.text(solution);
     });
   }
 
@@ -60,8 +84,8 @@ export function aiInsight(summary: string, solutions: string[], relatedCount: nu
     padding: 1,
     margin: 0,
     borderStyle: 'round',
-    borderColor: 'cyan',
-    title: '🤖 AI Analysis',
+    borderColor: '#a78bfa',
+    title: colors.ai.bold('🤖 AI Analysis'),
     titleAlignment: 'left',
   }));
 }
@@ -71,8 +95,9 @@ export function aiInsight(summary: string, solutions: string[], relatedCount: nu
  */
 export function spinner(text: string) {
   return ora({
-    text: chalk.cyan(text),
-    spinner: 'dots',
+    text: colors.primary(text),
+    spinner: 'dots12',
+    color: 'magenta',
   });
 }
 
@@ -80,9 +105,9 @@ export function spinner(text: string) {
  * Display a problem in a formatted way
  */
 export function problem(index: number, timeAgo: string, text: string, highlight: boolean = false): void {
-  const indexStr = chalk.gray(`[${index}]`);
-  const timeStr = chalk.dim(timeAgo);
-  const textStr = highlight ? chalk.bold.white(text) : chalk.white(text);
+  const indexStr = colors.textDim(`[${index}]`);
+  const timeStr = colors.textDim(timeAgo);
+  const textStr = highlight ? colors.textBright.bold(text) : colors.text(text);
 
   console.log(`${indexStr} ${timeStr}`);
   console.log(`    ${textStr}\n`);
@@ -96,23 +121,23 @@ export function patternsTable(patterns: Array<{ name: string; count: number; des
 
   const table = new Table({
     head: [
-      chalk.bold.cyan('Pattern'),
-      chalk.bold.cyan('Count'),
-      chalk.bold.cyan('Description')
+      colors.primary.bold('Pattern'),
+      colors.primary.bold('Count'),
+      colors.primary.bold('Description')
     ],
     colWidths: [25, 10, 60],
     wordWrap: true,
     style: {
       head: [],
-      border: ['gray']
+      border: ['dim']
     }
   });
 
   patterns.forEach(pattern => {
     table.push([
-      chalk.white(pattern.name),
-      chalk.yellow(pattern.count.toString()),
-      chalk.gray(pattern.description)
+      colors.textBright(pattern.name),
+      colors.number(pattern.count.toString()),
+      colors.textDim(pattern.description)
     ]);
   });
 
@@ -126,7 +151,7 @@ export function suggestions(items: string[]): void {
   if (items.length === 0) return;
 
   items.forEach((item, i) => {
-    console.log(chalk.cyan(`  ${i + 1}.`) + ' ' + chalk.white(item));
+    console.log(colors.accent(`  ${i + 1}.`) + ' ' + colors.text(item));
   });
   console.log('');
 }
@@ -138,12 +163,12 @@ export function resources(items: Array<{ title: string; url: string; description
   if (items.length === 0) return;
 
   items.forEach((item, i) => {
-    console.log(chalk.cyan(`  ${i + 1}.`) + ' ' + chalk.bold.white(item.title));
+    console.log(colors.accent(`  ${i + 1}.`) + ' ' + colors.textBright.bold(item.title));
     if (item.url !== '#') {
-      console.log('     ' + chalk.blue.underline(item.url));
+      console.log('     ' + colors.link.underline(item.url));
     }
     if (item.description) {
-      console.log('     ' + chalk.gray(item.description));
+      console.log('     ' + colors.textDim(item.description));
     }
     console.log('');
   });
@@ -157,15 +182,15 @@ export function summaryBox(title: string, stats: Array<{ label: string; value: s
 
   stats.forEach((stat, i) => {
     if (i > 0) content += '\n';
-    content += chalk.gray(stat.label + ': ') + chalk.white(stat.value?.toString() || 'N/A');
+    content += colors.textDim(stat.label + ': ') + colors.textBright(stat.value?.toString() || 'N/A');
   });
 
   console.log(boxen(content, {
     padding: 1,
     margin: { top: 1, bottom: 1 },
     borderStyle: 'round',
-    borderColor: 'green',
-    title: title,
+    borderColor: '#10b981',
+    title: colors.success.bold(title),
     titleAlignment: 'center',
   }));
 }
@@ -179,14 +204,14 @@ export function configDisplay(config: Record<string, string>): void {
     wordWrap: true,
     style: {
       head: [],
-      border: ['cyan']
+      border: ['dim']
     }
   });
 
   Object.entries(config).forEach(([key, value]) => {
     table.push([
-      chalk.cyan(key),
-      chalk.white(value)
+      colors.primary(key),
+      colors.text(value)
     ]);
   });
 
@@ -197,7 +222,7 @@ export function configDisplay(config: Record<string, string>): void {
  * Display a divider
  */
 export function divider(): void {
-  console.log(chalk.gray('─'.repeat(80)));
+  console.log(colors.textDim('─'.repeat(80)));
 }
 
 /**
@@ -207,7 +232,7 @@ export function trends(items: string[]): void {
   if (items.length === 0) return;
 
   items.forEach(item => {
-    console.log(chalk.yellow('  •') + ' ' + chalk.white(item));
+    console.log(colors.accent('  •') + ' ' + colors.text(item));
   });
   console.log('');
 }
