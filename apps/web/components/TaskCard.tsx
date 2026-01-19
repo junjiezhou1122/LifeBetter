@@ -89,15 +89,6 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
             <span>Blocking {task.blocking.length} item(s)</span>
           </div>
         )}
-
-        {/* Click hint */}
-        {task.canBreakdown !== false && (
-          <div className="mt-2 pt-2 border-t border-gray-100">
-            <p className="text-xs text-gray-400 italic">
-              Click to view subtasks →
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
