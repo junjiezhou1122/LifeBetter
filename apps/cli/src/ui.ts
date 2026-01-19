@@ -237,3 +237,26 @@ export function trends(items: string[]): void {
   });
   console.log('');
 }
+
+/**
+ * Highlight matching text in a string
+ */
+export function highlightMatch(text: string, query: string): string {
+  if (!query) return colors.text(text);
+
+  // Escape special regex characters
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  // Create case-insensitive regex
+  const regex = new RegExp(`(${escapedQuery})`, 'gi');
+
+  // Split text by matches and rebuild with highlighting
+  const parts = text.split(regex);
+
+  return parts.map(part => {
+    if (part.toLowerCase() === query.toLowerCase()) {
+      return colors.primary.bold(part);
+    }
+    return colors.text(part);
+  }).join('');
+}

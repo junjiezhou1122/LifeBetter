@@ -7,6 +7,7 @@ import { deleteCommand } from './commands/delete.js';
 import { configCommand } from './commands/config.js';
 import { reviewCommand } from './commands/review.js';
 import { summaryCommand } from './commands/summary.js';
+import { searchCommand } from './commands/search.js';
 import { ensureStorageExists } from './storage.js';
 
 const args = process.argv.slice(2);
@@ -49,6 +50,11 @@ async function main() {
       await summaryCommand(args.slice(1));
       break;
 
+    case 's':
+    case 'search':
+      searchCommand(args.slice(1));
+      break;
+
     case '--version':
     case '-v':
       console.log('lifebetter v1.5.0');
@@ -74,6 +80,8 @@ async function main() {
       console.log('  lb summary [daily]          Daily summary');
       console.log('  lb summary weekly           Weekly summary');
       console.log('  lb summary monthly          Monthly summary');
+      console.log('  lb search <query>           Search problems by text');
+      console.log('  lb s <query>                Search problems (short alias)');
       console.log('  lb --version                Show version');
       console.log('  lb --help                   Show this help');
       break;
