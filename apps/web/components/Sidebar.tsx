@@ -27,49 +27,45 @@ export function Sidebar({
 
   return (
     <>
-      {/* Backdrop - semi-transparent, not blocking */}
-      <div
-        className="fixed inset-0 bg-black bg-opacity-10 z-40 transition-opacity"
-        onClick={onClose}
-      />
-
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed top-0 bottom-0 z-50 bg-white shadow-2xl transition-transform duration-300 ease-in-out',
+          'fixed top-0 bottom-0 z-[60] bg-stone-100 border-l border-stone-200 transition-transform duration-300 ease-in-out',
           side === 'left' ? 'left-0' : 'right-0'
         )}
         style={{ width: `${defaultWidth}px` }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-          {title && <h2 className="text-lg font-semibold text-gray-900">{title}</h2>}
-          <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-white">
+          {title && <h2 className="text-base font-semibold text-stone-900">{title}</h2>}
+          <div className="flex items-center gap-1 ml-auto">
             {collapsible && (
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
                 title="Collapse"
+                aria-label="Collapse sidebar"
               >
                 {side === 'left' ? (
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4" />
                 ) : (
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4" />
                 )}
               </button>
             )}
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+              className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
               title="Close"
+              aria-label="Close sidebar"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto h-[calc(100vh-64px)] p-4">
+        <div className="overflow-y-auto h-[calc(100vh-64px)] p-6">
           {children}
         </div>
       </div>
