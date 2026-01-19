@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { TaskCard } from './TaskCard';
 import { AddTaskModal } from './AddTaskModal';
+import { BreakdownModal } from './BreakdownModal';
 import { ChevronLeft, Plus } from 'lucide-react';
 
 type TaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
@@ -39,6 +40,11 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [breakdownModalState, setBreakdownModalState] = useState<{
+    isOpen: boolean;
+    id: string;
+    title: string;
+  }>({ isOpen: false, id: '', title: '' });
 
   useEffect(() => {
     async function fetchTasks() {
@@ -119,6 +125,20 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
     }
   };
 
+  const handleBreakdownConfirm = async () => {
+    // Tasks are already created by the API, just refresh the tasks list
+    try {
+      const url = parentTaskId
+        ? `/api/tasks?parentTaskId=${parentTaskId}`
+        : `/api/tasks?problemId=${problemId}`;
+      const res = await fetch(url);
+      const tasksData = await res.json();
+      setTasks(tasksData);
+    } catch (error) {
+      console.error('Failed to refresh tasks:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -165,6 +185,15 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
         parentTitle={problemTitle}
       />
 
+      <BreakdownModal
+        isOpen={breakdownModalState.isOpen}
+        onClose={() => setBreakdownModalState({ ...breakdownModalState, isOpen: false })}
+        onConfirm={handleBreakdownConfirm}
+        type="task"
+        id={breakdownModalState.id}
+        title={breakdownModalState.title}
+      />
+
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-4 gap-4 h-[calc(100vh-200px)]">
           {COLUMNS.map(column => {
@@ -200,6 +229,11 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
                               <TaskCard
                                 task={task}
                                 onClick={() => onTaskClick(task)}
+                                onBreakdown={() => setBreakdownModalState({
+                                  isOpen: true,
+                                  id: task.id,
+                                  title: task.title
+                                })}
                               />
                             </div>
                           )}

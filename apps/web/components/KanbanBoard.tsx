@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { ProblemCard } from './ProblemCard';
 import { TaskBoard } from './TaskBoard';
 import { AddProblemModal } from './AddProblemModal';
+import { BreakdownModal } from './BreakdownModal';
 import { Plus } from 'lucide-react';
 
 type ProblemStatus = 'backlog' | 'todo' | 'in_progress' | 'blocked' | 'done';
@@ -57,6 +58,12 @@ export function KanbanBoard() {
   const [loading, setLoading] = useState(true);
   const [navigationStack, setNavigationStack] = useState<NavigationItem[]>([]);
   const [isAddProblemModalOpen, setIsAddProblemModalOpen] = useState(false);
+  const [breakdownModalState, setBreakdownModalState] = useState<{
+    isOpen: boolean;
+    type: 'problem' | 'task';
+    id: string;
+    title: string;
+  }>({ isOpen: false, type: 'problem', id: '', title: '' });
 
   // Fetch data on mount
   useEffect(() => {
@@ -154,6 +161,17 @@ export function KanbanBoard() {
     }
   };
 
+  const handleBreakdownConfirm = async (newTasks: any[]) => {
+    // Tasks are already created by the API, just refresh the tasks list
+    try {
+      const res = await fetch('/api/tasks');
+      const tasksData = await res.json();
+      setTasks(tasksData);
+    } catch (error) {
+      console.error('Failed to refresh tasks:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -202,6 +220,15 @@ export function KanbanBoard() {
         onAdd={handleAddProblem}
       />
 
+      <BreakdownModal
+        isOpen={breakdownModalState.isOpen}
+        onClose={() => setBreakdownModalState({ ...breakdownModalState, isOpen: false })}
+        onConfirm={handleBreakdownConfirm}
+        type={breakdownModalState.type}
+        id={breakdownModalState.id}
+        title={breakdownModalState.title}
+      />
+
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-5 gap-4 h-[calc(100vh-180px)]">
           {COLUMNS.map(column => {
@@ -244,6 +271,12 @@ export function KanbanBoard() {
                               <ProblemCard
                                 problem={problem}
                                 tasks={getTasksForProblem(problem.id)}
+                                onBreakdown={() => setBreakdownModalState({
+                                  isOpen: true,
+                                  type: 'problem',
+                                  id: problem.id,
+                                  title: problem.text
+                                })}
                               />
                             </div>
                           )}

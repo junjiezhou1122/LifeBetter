@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, ChevronRight } from 'lucide-react';
+import { AlertCircle, ChevronRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Task {
@@ -21,6 +21,7 @@ interface Task {
 interface TaskCardProps {
   task: Task;
   onClick: () => void;
+  onBreakdown?: () => void;
 }
 
 const PRIORITY_COLORS = {
@@ -37,9 +38,14 @@ const PRIORITY_ICONS = {
   low: '🟢',
 };
 
-export function TaskCard({ task, onClick }: TaskCardProps) {
+export function TaskCard({ task, onClick, onBreakdown }: TaskCardProps) {
   const priorityColor = PRIORITY_COLORS[task.priority as keyof typeof PRIORITY_COLORS] || PRIORITY_COLORS.medium;
   const priorityIcon = PRIORITY_ICONS[task.priority as keyof typeof PRIORITY_ICONS] || PRIORITY_ICONS.medium;
+
+  const handleBreakdownClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onBreakdown?.();
+  };
 
   return (
     <div
@@ -87,6 +93,19 @@ export function TaskCard({ task, onClick }: TaskCardProps) {
           <div className="flex items-center gap-1 text-xs text-yellow-600 mt-2">
             <AlertCircle className="w-3 h-3" />
             <span>Blocking {task.blocking.length} item(s)</span>
+          </div>
+        )}
+
+        {/* AI Breakdown button */}
+        {onBreakdown && (
+          <div className="mt-2 pt-2 border-t border-gray-100">
+            <button
+              onClick={handleBreakdownClick}
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-md transition-colors"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="font-medium">AI Breakdown</span>
+            </button>
           </div>
         )}
       </div>

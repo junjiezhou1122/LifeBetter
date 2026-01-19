@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Problem {
@@ -28,6 +28,7 @@ interface Task {
 interface ProblemCardProps {
   problem: Problem;
   tasks: Task[];
+  onBreakdown?: () => void;
 }
 
 const PRIORITY_COLORS = {
@@ -44,7 +45,7 @@ const PRIORITY_ICONS = {
   low: '🟢',
 };
 
-export function ProblemCard({ problem, tasks }: ProblemCardProps) {
+export function ProblemCard({ problem, tasks, onBreakdown }: ProblemCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   const priorityColor = PRIORITY_COLORS[problem.priority as keyof typeof PRIORITY_COLORS] || PRIORITY_COLORS.medium;
@@ -52,6 +53,11 @@ export function ProblemCard({ problem, tasks }: ProblemCardProps) {
 
   const completedTasks = tasks.filter(t => t.status === 'done').length;
   const totalTasks = tasks.length;
+
+  const handleBreakdownClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onBreakdown?.();
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
@@ -96,7 +102,7 @@ export function ProblemCard({ problem, tasks }: ProblemCardProps) {
         )}
 
         {/* Tasks summary */}
-        {totalTasks > 0 && (
+        {totalTasks > 0 ? (
           <div className="mt-2 pt-2 border-t border-gray-100">
             <button
               onClick={() => setExpanded(!expanded)}
@@ -139,6 +145,16 @@ export function ProblemCard({ problem, tasks }: ProblemCardProps) {
                 ))}
               </div>
             )}
+          </div>
+        ) : (
+          <div className="mt-2 pt-2 border-t border-gray-100">
+            <button
+              onClick={handleBreakdownClick}
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-md transition-colors"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="font-medium">AI Breakdown</span>
+            </button>
           </div>
         )}
       </div>
