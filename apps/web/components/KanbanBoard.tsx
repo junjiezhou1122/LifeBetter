@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { ProblemCard } from './ProblemCard';
 import { TaskBoard } from './TaskBoard';
+import { AddProblemModal } from './AddProblemModal';
+import { Plus } from 'lucide-react';
 
 type ProblemStatus = 'backlog' | 'todo' | 'in_progress' | 'blocked' | 'done';
 
@@ -54,6 +56,7 @@ export function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [navigationStack, setNavigationStack] = useState<NavigationItem[]>([]);
+  const [isAddProblemModalOpen, setIsAddProblemModalOpen] = useState(false);
 
   // Fetch data on mount
   useEffect(() => {
@@ -137,6 +140,20 @@ export function KanbanBoard() {
     setNavigationStack(prev => prev.slice(0, -1));
   };
 
+  const handleAddProblem = async (text: string, priority: string) => {
+    try {
+      const res = await fetch('/api/problems', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, priority })
+      });
+      const newProblem = await res.json();
+      setProblems(prev => [...prev, newProblem]);
+    } catch (error) {
+      console.error('Failed to create problem:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -163,12 +180,27 @@ export function KanbanBoard() {
 
   return (
     <div className="h-screen bg-gray-50 p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">📊 Kanban Board</h1>
-        <p className="text-gray-600 mt-2">
-          {problems.length} problems • {tasks.length} tasks
-        </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">📊 Kanban Board</h1>
+          <p className="text-gray-600 mt-2">
+            {problems.length} problems • {tasks.length} tasks
+          </p>
+        </div>
+        <button
+          onClick={() => setIsAddProblemModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          Add Problem
+        </button>
       </div>
+
+      <AddProblemModal
+        isOpen={isAddProblemModalOpen}
+        onClose={() => setIsAddProblemModalOpen(false)}
+        onAdd={handleAddProblem}
+      />
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-5 gap-4 h-[calc(100vh-180px)]">

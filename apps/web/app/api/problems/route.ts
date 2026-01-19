@@ -39,6 +39,28 @@ export async function GET() {
   return NextResponse.json(storage.problems);
 }
 
+export async function POST(request: Request) {
+  const { text, priority = 'medium' } = await request.json();
+  const storage = readStorage();
+
+  const newProblem = {
+    id: crypto.randomUUID(),
+    text,
+    status: 'backlog',
+    priority,
+    breakdownStatus: 'pending',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    blockedBy: [],
+    blocking: [],
+    tags: []
+  };
+
+  storage.problems.push(newProblem);
+  writeStorage(storage);
+  return NextResponse.json(newProblem);
+}
+
 export async function PATCH(request: Request) {
   const { id, updates } = await request.json();
   const storage = readStorage();

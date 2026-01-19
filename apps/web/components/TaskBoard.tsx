@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { TaskCard } from './TaskCard';
-import { ChevronLeft } from 'lucide-react';
+import { AddTaskModal } from './AddTaskModal';
+import { ChevronLeft, Plus } from 'lucide-react';
 
 type TaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
 
@@ -37,6 +38,7 @@ const COLUMNS: { id: TaskStatus; title: string; color: string }[] = [
 export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTaskClick }: TaskBoardProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchTasks() {
@@ -97,6 +99,26 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
     }
   };
 
+  const handleAddTask = async (title: string, description: string, priority: string) => {
+    try {
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          problemId,
+          parentTaskId,
+          title,
+          description,
+          priority
+        })
+      });
+      const newTask = await res.json();
+      setTasks(prev => [...prev, newTask]);
+    } catch (error) {
+      console.error('Failed to create task:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -117,13 +139,31 @@ export function TaskBoard({ problemId, parentTaskId, problemTitle, onBack, onTas
           <span>Back to {parentTaskId ? 'Parent Task' : 'Problems'}</span>
         </button>
 
-        <h1 className="text-3xl font-bold text-gray-900">
-          📋 Tasks for: {problemTitle}
-        </h1>
-        <p className="text-gray-600 mt-2">
-          {tasks.length} task{tasks.length === 1 ? '' : 's'}
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              📋 Tasks for: {problemTitle}
+            </h1>
+            <p className="text-gray-600 mt-2">
+              {tasks.length} task{tasks.length === 1 ? '' : 's'}
+            </p>
+          </div>
+          <button
+            onClick={() => setIsAddTaskModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Add Task
+          </button>
+        </div>
       </div>
+
+      <AddTaskModal
+        isOpen={isAddTaskModalOpen}
+        onClose={() => setIsAddTaskModalOpen(false)}
+        onAdd={handleAddTask}
+        parentTitle={problemTitle}
+      />
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-4 gap-4 h-[calc(100vh-200px)]">

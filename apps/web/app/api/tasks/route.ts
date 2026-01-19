@@ -46,6 +46,30 @@ export async function GET(request: Request) {
   return NextResponse.json(storage.tasks);
 }
 
+export async function POST(request: Request) {
+  const { problemId, parentTaskId, title, description, priority = 'medium' } = await request.json();
+  const storage = readStorage();
+
+  const newTask = {
+    id: crypto.randomUUID(),
+    problemId,
+    parentTaskId: parentTaskId || null,
+    title,
+    description: description || '',
+    status: 'todo',
+    priority,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    blockedBy: [],
+    blocking: [],
+    canBreakdown: true
+  };
+
+  storage.tasks.push(newTask);
+  writeStorage(storage);
+  return NextResponse.json(newTask);
+}
+
 export async function PATCH(request: Request) {
   const { id, updates } = await request.json();
   const storage = readStorage();
