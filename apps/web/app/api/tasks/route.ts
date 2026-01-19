@@ -27,9 +27,17 @@ function writeStorage(storage: any) {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const problemId = searchParams.get('problemId');
+  const parentTaskId = searchParams.get('parentTaskId');
 
   const storage = readStorage();
 
+  // Filter by parentTaskId (for subtasks)
+  if (parentTaskId) {
+    const tasks = storage.tasks.filter((t: any) => t.parentTaskId === parentTaskId);
+    return NextResponse.json(tasks);
+  }
+
+  // Filter by problemId (top-level tasks only)
   if (problemId) {
     const tasks = storage.tasks.filter((t: any) => t.problemId === problemId && !t.parentTaskId);
     return NextResponse.json(tasks);

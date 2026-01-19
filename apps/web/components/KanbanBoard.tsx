@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { ProblemCard } from './ProblemCard';
+import { TaskBoard } from './TaskBoard';
 
 type ProblemStatus = 'backlog' | 'todo' | 'in_progress' | 'blocked' | 'done';
 
@@ -22,9 +23,22 @@ interface Problem {
 interface Task {
   id: string;
   problemId: string;
+  parentTaskId?: string;
   title: string;
   status: string;
   priority: string;
+  createdAt: string;
+  updatedAt: string;
+  description?: string;
+  blockedBy?: string[];
+  blocking?: string[];
+  canBreakdown?: boolean;
+}
+
+interface NavigationItem {
+  type: 'problem' | 'task';
+  id: string;
+  title: string;
 }
 
 const COLUMNS: { id: ProblemStatus; title: string; color: string }[] = [
@@ -39,6 +53,7 @@ export function KanbanBoard() {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [navigationStack, setNavigationStack] = useState<NavigationItem[]>([]);
 
   // Fetch data on mount
   useEffect(() => {
@@ -106,7 +121,20 @@ export function KanbanBoard() {
   };
 
   const getTasksForProblem = (problemId: string) => {
-    return tasks.filter(t => t.problemId === problemId);
+    return tasks.filter(t => t.problemId === problemId && !t.parentTaskId);
+  };
+
+  const handleProblemClick = (problem: Problem) => {
+    setNavigationStack([{ type: 'problem', id: problem.id, title: problem.text }]);
+  };
+
+  const handleTaskClick = (task: Task) => {
+    const currentItem = navigationStack[navigationStack.length - 1];
+    setNavigationStack([...navigationStack, { type: 'task', id: task.id, title: task.title }]);
+  };
+
+  const handleBack = () => {
+    setNavigationStack(prev => prev.slice(0, -1));
   };
 
   if (loading) {
@@ -114,6 +142,22 @@ export function KanbanBoard() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-xl text-gray-600">Loading...</div>
       </div>
+    );
+  }
+
+  // If we're viewing a task board (navigated into a problem or task)
+  if (navigationStack.length > 0) {
+    const currentItem = navigationStack[navigationStack.length - 1];
+    const isViewingProblem = currentItem.type === 'problem';
+
+    return (
+      <TaskBoard
+        problemId={isViewingProblem ? currentItem.id : navigationStack[0].id}
+        parentTaskId={isViewingProblem ? undefined : currentItem.id}
+        problemTitle={currentItem.title}
+        onBack={handleBack}
+        onTaskClick={handleTaskClick}
+      />
     );
   }
 
@@ -157,6 +201,13 @@ export function KanbanBoard() {
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               className={`mb-2 ${snapshot.isDragging ? 'opacity-50' : ''}`}
+                              onClick={(e) => {
+                                // Only navigate if not dragging
+                                if (!snapshot.isDragging) {
+                                  e.stopPropagation();
+                                  handleProblemClick(problem);
+                                }
+                              }}
                             >
                               <ProblemCard
                                 problem={problem}
