@@ -69,6 +69,17 @@ export function readStorage(): Storage {
     if (!storage.tasks) storage.tasks = [];
     if (!storage.notifications) storage.notifications = [];
 
+    // Migrate old problems to new format
+    storage.problems = storage.problems.map(p => ({
+      ...p,
+      status: p.status || 'backlog',
+      priority: p.priority || 'medium',
+      breakdownStatus: p.breakdownStatus || 'pending',
+      updatedAt: p.updatedAt || p.createdAt,
+      blockedBy: p.blockedBy || [],
+      blocking: p.blocking || []
+    }));
+
     return storage;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
