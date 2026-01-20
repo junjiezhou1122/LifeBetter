@@ -180,7 +180,7 @@ export function BreakdownSidebarContent({ itemId, title, parentId, onConfirm }: 
           {showSuggestions && metaSkillSuggestions.length > 0 && (
             <div className="w-full mb-8 space-y-3">
               <div className="flex items-center gap-2 mb-4">
-                <Lightbulb className="w-5 h-5 text-amber-600" />
+                <Lightbulb className="w-5 h-5 text-amber-500" />
                 <h3 className="text-sm font-semibold text-stone-900">
                   AI Suggests These Approaches
                 </h3>
@@ -189,11 +189,11 @@ export function BreakdownSidebarContent({ itemId, title, parentId, onConfirm }: 
               {metaSkillSuggestions.map((suggestion) => (
                 <div
                   key={suggestion.metaSkillId}
-                  className="bg-white border-2 border-stone-200 rounded-xl p-4 hover:border-stone-400 transition-all"
+                  className="bg-white border-2 border-stone-200 rounded-xl p-4 hover:border-amber-300 transition-all"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Brain className="w-4 h-4 text-purple-600" />
+                      <Brain className="w-4 h-4 text-amber-500" />
                       <h4 className="font-semibold text-stone-900 text-sm">
                         {suggestion.metaSkillName}
                       </h4>
@@ -216,7 +216,7 @@ export function BreakdownSidebarContent({ itemId, title, parentId, onConfirm }: 
                   <button
                     onClick={() => handleGenerate(suggestion.metaSkillId)}
                     disabled={loading}
-                    className="w-full px-3 py-2 bg-stone-800 text-white text-sm font-semibold rounded-lg hover:bg-stone-900 disabled:bg-stone-300 disabled:cursor-not-allowed transition-all"
+                    className="w-full px-3 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-all"
                   >
                     {loading ? 'Generating...' : `Use ${suggestion.metaSkillName}`}
                   </button>
@@ -234,8 +234,8 @@ export function BreakdownSidebarContent({ itemId, title, parentId, onConfirm }: 
             </div>
           )}
 
-          <div className="w-16 h-16 bg-stone-200 rounded-2xl flex items-center justify-center mb-4">
-            <Sparkles className="w-8 h-8 text-stone-700" />
+          <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-4">
+            <Sparkles className="w-8 h-8 text-amber-500" />
           </div>
           <h3 className="text-base font-semibold text-stone-900 mb-2">
             AI Breakdown
@@ -248,7 +248,7 @@ export function BreakdownSidebarContent({ itemId, title, parentId, onConfirm }: 
           <button
             onClick={() => handleGenerate()}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-stone-800 text-white text-sm font-semibold rounded-xl hover:bg-stone-900 disabled:bg-stone-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-stone-800/20 hover:shadow-xl hover:shadow-stone-800/30"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-white text-sm font-semibold rounded-xl hover:bg-amber-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30"
             aria-label="Generate AI breakdown"
           >
             {loading ? (
@@ -287,8 +287,8 @@ export function BreakdownSidebarContent({ itemId, title, parentId, onConfirm }: 
                   onClick={() => toggleTask(index)}
                   className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
                     selectedTasks.has(index)
-                      ? 'border-stone-400 bg-stone-100 shadow-md shadow-stone-200'
-                      : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm'
+                      ? 'border-amber-400 bg-amber-50 shadow-md shadow-amber-200'
+                      : 'border-stone-200 bg-white hover:border-amber-300 hover:shadow-sm'
                   }`}
                   role="checkbox"
                   aria-checked={selectedTasks.has(index)}
@@ -303,7 +303,7 @@ export function BreakdownSidebarContent({ itemId, title, parentId, onConfirm }: 
                   <div className="flex items-start gap-3">
                     <div className="pt-0.5">
                       {selectedTasks.has(index) ? (
-                        <CheckSquare className="w-5 h-5 text-stone-700" />
+                        <CheckSquare className="w-5 h-5 text-amber-500" />
                       ) : (
                         <Square className="w-5 h-5 text-stone-400" />
                       )}
@@ -345,7 +345,7 @@ export function BreakdownSidebarContent({ itemId, title, parentId, onConfirm }: 
             <button
               onClick={handleConfirm}
               disabled={selectedTasks.size === 0}
-              className="flex-1 px-4 py-2.5 bg-stone-800 text-white text-sm font-semibold rounded-xl hover:bg-stone-900 disabled:bg-stone-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-stone-800/20 hover:shadow-xl hover:shadow-stone-800/30"
+              className="flex-1 px-4 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-xl hover:bg-amber-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30"
               aria-label={`Create ${selectedTasks.size} sub-item${selectedTasks.size !== 1 ? 's' : ''}`}
             >
               Create {selectedTasks.size} {selectedTasks.size === 1 ? 'Item' : 'Items'}

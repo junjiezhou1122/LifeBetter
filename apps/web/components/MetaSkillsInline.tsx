@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Brain } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, Edit2, Trash2, Brain, X } from 'lucide-react';
 
 interface MetaSkill {
   id: string;
@@ -19,7 +18,7 @@ interface MetaSkill {
   personalNotes?: string;
 }
 
-export default function MetaSkillsPage() {
+export function MetaSkillsInline() {
   const [metaSkills, setMetaSkills] = useState<MetaSkill[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -53,73 +52,65 @@ export default function MetaSkillsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-xl text-stone-600">Loading...</div>
+      <div className="flex items-center justify-center h-full">
+        <div className="text-xl text-stone-600">Loading meta-skills...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 p-6">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Brain className="w-8 h-8 text-amber-600" />
-              <h1 className="text-3xl font-bold text-stone-900">Meta-Skills Library</h1>
+    <div className="h-full overflow-y-auto p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Brain className="w-8 h-8 text-amber-500" />
+                <h1 className="text-3xl font-bold text-stone-900">Meta-Skills Library</h1>
+              </div>
+              <p className="text-stone-600">Universal problem-solving principles that work everywhere</p>
             </div>
-            <p className="text-stone-600">Universal problem-solving principles that work everywhere</p>
-          </div>
-          <div className="flex gap-3">
-            <Link
-              href="/"
-              className="px-4 py-2 border border-stone-300 text-stone-700 font-medium rounded-lg hover:bg-stone-100 transition-colors"
-            >
-              Back to Board
-            </Link>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2"
             >
               <Plus className="w-5 h-5" />
               Create Meta-Skill
             </button>
           </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="bg-white rounded-xl p-4 border border-stone-200">
+              <p className="text-sm text-stone-500 mb-1">Total Skills</p>
+              <p className="text-2xl font-bold text-stone-900">{metaSkills.length}</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 border border-stone-200">
+              <p className="text-sm text-stone-500 mb-1">Total Applications</p>
+              <p className="text-2xl font-bold text-stone-900">
+                {metaSkills.reduce((sum, ms) => sum + ms.timesApplied, 0)}
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-4 border border-stone-200">
+              <p className="text-sm text-stone-500 mb-1">Success Rate</p>
+              <p className="text-2xl font-bold text-stone-900">
+                {metaSkills.length > 0
+                  ? Math.round((metaSkills.reduce((sum, ms) => sum + ms.timesSuccessful, 0) /
+                      Math.max(metaSkills.reduce((sum, ms) => sum + ms.timesApplied, 0), 1)) * 100)
+                  : 0}%
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-4 border border-stone-200">
+              <p className="text-sm text-stone-500 mb-1">Most Effective</p>
+              <p className="text-sm font-semibold text-stone-900 truncate">
+                {metaSkills[0]?.name || 'None yet'}
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl p-4 border border-stone-200">
-            <p className="text-sm text-stone-500 mb-1">Total Skills</p>
-            <p className="text-2xl font-bold text-stone-900">{metaSkills.length}</p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-stone-200">
-            <p className="text-sm text-stone-500 mb-1">Total Applications</p>
-            <p className="text-2xl font-bold text-stone-900">
-              {metaSkills.reduce((sum, ms) => sum + ms.timesApplied, 0)}
-            </p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-stone-200">
-            <p className="text-sm text-stone-500 mb-1">Success Rate</p>
-            <p className="text-2xl font-bold text-stone-900">
-              {metaSkills.length > 0
-                ? Math.round((metaSkills.reduce((sum, ms) => sum + ms.timesSuccessful, 0) /
-                    Math.max(metaSkills.reduce((sum, ms) => sum + ms.timesApplied, 0), 1)) * 100)
-                : 0}%
-            </p>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-stone-200">
-            <p className="text-sm text-stone-500 mb-1">Most Effective</p>
-            <p className="text-sm font-semibold text-stone-900 truncate">
-              {metaSkills[0]?.name || 'None yet'}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Meta-Skills Grid */}
-      <div className="max-w-7xl mx-auto">
+        {/* Meta-Skills Grid */}
         {metaSkills.length === 0 ? (
           <div className="bg-white rounded-xl border border-stone-200 p-12 text-center">
             <Brain className="w-16 h-16 text-stone-300 mx-auto mb-4" />
@@ -127,7 +118,7 @@ export default function MetaSkillsPage() {
             <p className="text-stone-600 mb-6">Create your first meta-skill to start tracking effective strategies</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition-colors"
+              className="px-4 py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition-colors"
             >
               Create Meta-Skill
             </button>
@@ -147,7 +138,7 @@ export default function MetaSkillsPage() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Brain className="w-5 h-5 text-amber-600" />
+                      <Brain className="w-5 h-5 text-amber-500" />
                       <h3 className="font-semibold text-stone-900 text-base">
                         {skill.name}
                       </h3>
@@ -155,7 +146,7 @@ export default function MetaSkillsPage() {
                     <div className="flex gap-1">
                       <button
                         onClick={() => {/* TODO: Edit */}}
-                        className="p-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-colors"
+                        className="p-1.5 text-stone-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -324,7 +315,7 @@ function CreateMetaSkillModal({ onClose, onCreated }: { onClose: () => void; onC
             <button
               type="submit"
               disabled={loading || !name.trim() || !description.trim()}
-              className="flex-1 px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 px-4 py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Creating...' : 'Create Meta-Skill'}
             </button>

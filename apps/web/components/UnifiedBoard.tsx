@@ -8,7 +8,13 @@ import { EditableItemCard } from './EditableItemCard';
 import { BreakdownSidebarContent } from './BreakdownSidebarContent';
 import { ItemDetailSidebar } from './ItemDetailSidebar';
 import { MetaSkillFeedbackModal } from './MetaSkillFeedbackModal';
-import { Plus, ChevronLeft, Brain } from 'lucide-react';
+import { LeftSidebar } from './LeftSidebar';
+import { SearchBar } from './SearchBar';
+import { DashboardInline } from './DashboardInline';
+import { MetaSkillsInline } from './MetaSkillsInline';
+import { TimelineInline } from './TimelineInline';
+import { ReflectionInline } from './ReflectionInline';
+import { Plus, ChevronLeft, Menu } from 'lucide-react';
 import Link from 'next/link';
 
 type ItemStatus = 'backlog' | 'todo' | 'in_progress' | 'blocked' | 'done';
@@ -29,6 +35,9 @@ interface Item {
   blocking?: string[];
   canBreakdown?: boolean;
   order: number;
+  solvedWithMetaSkill?: string;
+  metaSkillSuccess?: boolean;
+  metaSkillIds?: string[];
 }
 
 interface NavigationItem {
@@ -77,11 +86,27 @@ export function UnifiedBoard() {
     metaSkillName: string;
   }>({ isOpen: false, item: null, metaSkillName: '' });
   const [metaSkills, setMetaSkills] = useState<any[]>([]);
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(() => {
+    // Load from localStorage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('leftSidebarOpen');
+      return saved ? JSON.parse(saved) : true; // Default to open
+    }
+    return true;
+  });
+  const [currentView, setCurrentView] = useState<'board' | 'dashboard' | 'timeline' | 'meta-skills' | 'reflection'>('board');
 
   const currentNav = navigationStack[navigationStack.length - 1];
   const currentParentId = currentNav.id;
   const currentDepth = currentNav.depth;
   const isRootLevel = currentDepth === 0;
+
+  // Save leftSidebarOpen state to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('leftSidebarOpen', JSON.stringify(leftSidebarOpen));
+    }
+  }, [leftSidebarOpen]);
 
   // Choose columns based on depth
   const columns = isRootLevel ? ROOT_COLUMNS : NESTED_COLUMNS;
@@ -270,7 +295,7 @@ export function UnifiedBoard() {
       setItems(prev =>
         prev.map(item =>
           item.id === itemId
-            ? { ...item, ...updates, updatedAt: new Date().toISOString() }
+            ? { ...item, ...updates, updatedAt: new Date().toISOString() } as Item
             : item
         )
       );
@@ -279,7 +304,7 @@ export function UnifiedBoard() {
       if (detailSidebar.item?.id === itemId) {
         setDetailSidebar({
           ...detailSidebar,
-          item: { ...detailSidebar.item, ...updates, updatedAt: new Date().toISOString() }
+          item: { ...detailSidebar.item, ...updates, updatedAt: new Date().toISOString() } as Item
         });
       }
     } catch (error) {
@@ -321,6 +346,17 @@ export function UnifiedBoard() {
     }
   };
 
+  const handlePlanAgentItemClick = (itemId: string) => {
+    const item = allItems.find(i => i.id === itemId);
+    if (item) {
+      setDetailSidebar({ isOpen: true, item });
+    }
+  };
+
+  const handleToggleSidebar = () => {
+    setLeftSidebarOpen(!leftSidebarOpen);
+  };
+
   const handleBreakdownConfirm = async () => {
     try {
       const parentParam = currentParentId === null ? 'null' : currentParentId;
@@ -343,13 +379,41 @@ export function UnifiedBoard() {
 
   return (
     <div className="h-screen bg-stone-50 flex">
+      {/* Left Sidebar */}
+      <LeftSidebar
+        isOpen={leftSidebarOpen}
+        onClose={() => setLeftSidebarOpen(false)}
+        onItemClick={handlePlanAgentItemClick}
+        onNavigate={(view) => setCurrentView(view)}
+      />
+
       {/* Main Content */}
-      <div className={`flex-1 p-6 transition-all duration-300 ${breakdownSidebar.isOpen ? 'mr-[400px]' : 'mr-0'}`}>
-        {/* Header with Breadcrumb */}
-        <div className="mb-6">
+      <div className={`flex-1 transition-all duration-300 ${
+        leftSidebarOpen ? 'ml-80' : 'ml-0'
+      } ${breakdownSidebar.isOpen || detailSidebar.isOpen ? 'mr-[500px]' : 'mr-0'}`}>
+        {currentView === 'dashboard' && <DashboardInline />}
+        {currentView === 'meta-skills' && <MetaSkillsInline />}
+        {currentView === 'timeline' && <TimelineInline />}
+        {currentView === 'reflection' && <ReflectionInline />}
+        {currentView === 'board' && (
+          <div className="p-6">
+            {/* Header with Breadcrumb */}
+            <div className="mb-6">
           {/* Breadcrumb Navigation */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
+              {/* Sidebar Toggle Button */}
+              {!leftSidebarOpen && (
+                <button
+                  onClick={handleToggleSidebar}
+                  className="flex items-center gap-2 px-3 py-2 bg-stone-100 text-stone-700 font-medium rounded-lg hover:bg-stone-200 transition-colors mr-4"
+                  title="Open Sidebar"
+                >
+                  <Menu className="w-4 h-4" />
+                  <span className="text-sm">Menu</span>
+                </button>
+              )}
+
               {navigationStack.map((nav, index) => (
                 <div key={index} className="flex items-center gap-2">
                   {index > 0 && <span className="text-stone-400">/</span>}
@@ -366,41 +430,28 @@ export function UnifiedBoard() {
                 </div>
               ))}
             </div>
+          </div>
 
-            {/* Meta-Skills Library Link */}
-            <Link
-              href="/meta-skills"
-              className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 font-medium rounded-lg hover:bg-purple-200 transition-colors"
-            >
-              <Brain className="w-4 h-4" />
-              Meta-Skills Library
-            </Link>
+          {/* Search Bar */}
+          <div className="mb-4">
+            <SearchBar onResultClick={handlePlanAgentItemClick} />
           </div>
 
           {/* Back Button (if not at root) */}
           {!isRootLevel && (
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 text-stone-600 hover:text-stone-900 mb-4 transition-colors"
+              className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               <span className="text-sm">Back</span>
             </button>
           )}
-
-          <div>
-            <h1 className="text-2xl font-semibold text-stone-900">
-              {isRootLevel ? '📊 All Items' : `📋 ${currentNav.title}`}
-            </h1>
-            <p className="text-sm text-stone-500 mt-1">
-              {items.length} item{items.length === 1 ? '' : 's'} • Level {currentDepth}
-            </p>
-          </div>
         </div>
 
         {/* Kanban Board */}
         <DragDropContext onDragEnd={handleDragEnd}>
-          <div className={`grid gap-4 h-[calc(100vh-200px)] ${
+          <div className={`grid gap-4 h-[calc(100vh-140px)] ${
             isRootLevel ? 'grid-cols-5' : 'grid-cols-4'
           }`}>
             {columns.map(column => {
@@ -438,7 +489,7 @@ export function UnifiedBoard() {
                         {/* Editable Card */}
                         {showEditableCard[column.id] && (
                           <EditableItemCard
-                            onSave={(title, description, priority) => handleEditableCardSave(column.id, title, description, priority)}
+                            onSave={(title, description, priority) => handleEditableCardSave(column.id as ItemStatus, title, description, priority)}
                             onCancel={() => setShowEditableCard(prev => ({ ...prev, [column.id]: false }))}
                           />
                         )}
@@ -477,6 +528,8 @@ export function UnifiedBoard() {
             })}
           </div>
         </DragDropContext>
+          </div>
+        )}
       </div>
 
       {/* Breakdown Sidebar */}
