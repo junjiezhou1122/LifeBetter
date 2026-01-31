@@ -1,7 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
-import { MetaSkill, ItemStorage } from '@lifebetter/shared/types';
+
+type MetaSkillWorkflow =
+  | { type: 'ai-breakdown'; aiPrompt?: string }
+  | { type: 'template'; template?: Array<{ title: string; description?: string; estimatedHours?: number }> }
+  | { type: string; [key: string]: unknown };
+
+interface MetaSkill {
+  id: string;
+  name: string;
+  description: string;
+  examples?: string[];
+  workflow?: MetaSkillWorkflow;
+  category?: string;
+  timesApplied: number;
+  timesSuccessful: number;
+  effectiveness?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  source?: string;
+  isActive: boolean;
+}
+
+interface ItemStorage {
+  version: number;
+  items: unknown[];
+  metaSkills: MetaSkill[];
+  notifications: unknown[];
+  reflections?: unknown[];
+}
 
 const STORAGE_PATH = path.join(process.env.HOME || '', '.lifebetter', 'problems.json');
 

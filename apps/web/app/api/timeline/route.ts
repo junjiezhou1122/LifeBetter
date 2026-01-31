@@ -1,44 +1,12 @@
 import { NextResponse } from 'next/server';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
-
-function getStoragePath(): string {
-  const homeDir = os.homedir();
-  const storageDir = path.join(homeDir, '.lifebetter');
-
-  if (!fs.existsSync(storageDir)) {
-    fs.mkdirSync(storageDir, { recursive: true });
-  }
-
-  return path.join(storageDir, 'problems.json');
-}
-
-function readStorage() {
-  const storagePath = getStoragePath();
-
-  try {
-    const data = fs.readFileSync(storagePath, 'utf-8');
-    const storage = JSON.parse(data);
-
-    if (storage.version === 2 && storage.items) {
-      if (!storage.metaSkills) {
-        storage.metaSkills = [];
-      }
-      return storage;
-    }
-
-    return { items: [], metaSkills: [], notifications: [], version: 2 };
-  } catch (error) {
-    return { items: [], metaSkills: [], notifications: [], version: 2 };
-  }
-}
+import { readStorage } from '@/lib/server/storage';
+import type { Item, ItemStatus } from '@/lib/types';
 
 interface TimelineItem {
   id: string;
   title: string;
   description?: string;
-  status: string;
+  status: ItemStatus;
   priority: string;
   type: 'created' | 'updated' | 'completed' | 'status_change';
   timestamp: string;
@@ -53,13 +21,13 @@ export async function GET(request: Request) {
     const filterStatus = searchParams.get('status') || 'all';
     const dateRange = searchParams.get('range') || '30d';
 
-    const storage = readStorage();
-    const items = storage.items || [];
+    const storage = await readStorage();
+    const items = storage.items;
 
     // Convert items to timeline events
     const timelineItems: TimelineItem[] = [];
 
-    items.forEach((item: any) => {
+    items.forEach((item: Item) => {
       // Created event
       timelineItems.push({
         id: `${item.id}-created`,

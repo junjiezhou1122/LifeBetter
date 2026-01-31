@@ -1,52 +1,25 @@
 import { NextResponse } from 'next/server';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
+import { readStorage } from '@/lib/server/storage';
+import type { Item } from '@/lib/types';
 
-function getStoragePath(): string {
-  const homeDir = os.homedir();
-  const storageDir = path.join(homeDir, '.lifebetter');
-
-  if (!fs.existsSync(storageDir)) {
-    fs.mkdirSync(storageDir, { recursive: true });
-  }
-
-  return path.join(storageDir, 'problems.json');
-}
-
-function readStorage() {
-  const storagePath = getStoragePath();
-
-  try {
-    const data = fs.readFileSync(storagePath, 'utf-8');
-    const storage = JSON.parse(data);
-
-    if (storage.version === 2 && storage.items) {
-      if (!storage.metaSkills) {
-        storage.metaSkills = [];
-      }
-      return storage;
-    }
-
-    return { items: [], metaSkills: [], notifications: [], version: 2 };
-  } catch (error) {
-    return { items: [], metaSkills: [], notifications: [], version: 2 };
-  }
-}
-
-function searchItems(items: any[], query: string, filters: any) {
+function searchItems(items: Item[], query: string, filters: {
+  status: string;
+  priority: string;
+  depth: string;
+  tags: string[];
+}) {
   let results = items;
 
   // Keyword search
   if (query && query.trim()) {
     const lowerQuery = query.toLowerCase();
-    results = results.filter(item => {
-      const titleMatch = item.title?.toLowerCase().includes(lowerQuery);
-      const descMatch = item.description?.toLowerCase().includes(lowerQuery);
-      const tagsMatch = item.tags?.some((tag: string) => tag.toLowerCase().includes(lowerQuery));
-      return titleMatch || descMatch || tagsMatch;
-    });
-  }
+      results = results.filter(item => {
+        const titleMatch = item.title?.toLowerCase().includes(lowerQuery);
+        const descMatch = item.description?.toLowerCase().includes(lowerQuery);
+        const tagsMatch = item.tags?.some((tag: string) => tag.toLowerCase().includes(lowerQuery));
+        return titleMatch || descMatch || tagsMatch;
+      });
+    }
 
   // Filter by status
   if (filters.status && filters.status !== 'all') {
@@ -82,8 +55,8 @@ export async function GET(request: Request) {
     const depth = searchParams.get('depth') || 'all';
     const tags = searchParams.get('tags')?.split(',').filter(Boolean) || [];
 
-    const storage = readStorage();
-    const items = storage.items || [];
+    const storage = await readStorage();
+    const items = storage.items;
 
     const filters = { status, priority, depth, tags };
     const results = searchItems(items, query, filters);

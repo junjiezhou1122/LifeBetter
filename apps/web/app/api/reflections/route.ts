@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 function getStoragePath(): string {
   const homeDir = os.homedir();
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
     }
 
     const newReflection: Reflection = {
-      id: uuidv4(),
+      id: randomUUID(),
       date,
       content,
       createdAt: new Date().toISOString(),

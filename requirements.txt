@@ -1,0 +1,22 @@
+# LifeBetter Meta-Learning System Requirements
+
+# Core dependencies
+numpy>=1.21.0
+pandas>=1.3.0
+scikit-learn>=1.0.0
+
+# Deep learning (for meta-learning implementations)
+torch>=1.10.0
+tensorflow>=2.8.0
+
+# Utilities
+PyYAML>=6.0
+tqdm>=4.62.0
+
+# Testing
+pytest>=6.2.4
+unittest-xml-reporting>=3.0.4
+
+# Development tools
+black>=22.0.0
+flake8>=4.0.0
