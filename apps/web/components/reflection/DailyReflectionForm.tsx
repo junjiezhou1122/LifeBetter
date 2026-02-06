@@ -60,27 +60,25 @@ export function DailyReflectionForm({ existingReflection, onSave }: DailyReflect
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Date Picker */}
       <div>
-        <label className="block text-sm font-semibold text-stone-700 mb-2">
-          <Calendar className="w-4 h-4 inline mr-2" />
+        <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
+          <Calendar className="mr-1 inline h-3.5 w-3.5" />
           Date
         </label>
         <input
           type="date"
           value={formData.date}
           onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-          className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+          className="lb-input w-full rounded-lg px-3 py-2 text-sm"
           required
         />
       </div>
 
-      {/* Markdown Content */}
       <div>
-        <label className="block text-sm font-semibold text-stone-700 mb-2">
+        <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
           Daily Reflection *
         </label>
-        <div className="mb-2 text-xs text-stone-500">
+        <div className="mb-2 text-[11px] text-[#7b6f5d]">
           Supports Markdown: **bold**, *italic*, # headings, - lists, etc.
         </div>
         <textarea
@@ -99,29 +97,28 @@ export function DailyReflectionForm({ existingReflection, onSave }: DailyReflect
 
 ## Tomorrow's plan
 - "
-          className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 min-h-[400px] font-mono text-sm"
+          className="lb-input min-h-[280px] w-full rounded-lg px-3 py-2.5 font-mono text-xs"
           required
         />
       </div>
 
-      {/* Submit Button */}
       <button
         type="submit"
         disabled={saving || saved}
-        className={`w-full py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
+        className={`flex w-full items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-semibold transition-all ${
           saved
-            ? 'bg-green-500 text-white'
-            : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-lg'
+            ? 'bg-[#2f7b65] text-white'
+            : 'bg-gradient-to-r from-[#d26a3b] to-[#bb5529] text-white shadow-[0_8px_18px_rgba(95,67,31,0.2)] hover:from-[#bf5f33] hover:to-[#a94a22]'
         }`}
       >
         {saved ? (
           <>
-            <CheckCircle className="w-5 h-5" />
+            <CheckCircle className="h-4 w-4" />
             Saved!
           </>
         ) : (
           <>
-            <Save className="w-5 h-5" />
+            <Save className="h-4 w-4" />
             {saving ? 'Saving...' : 'Save Reflection'}
           </>
         )}

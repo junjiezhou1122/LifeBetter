@@ -5,66 +5,69 @@ interface NavigationMenuProps {
 }
 
 export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
+  const itemClass =
+    "w-full px-3 py-2 text-left flex items-center gap-2.5 transition rounded-lg text-[#5d4b34] hover:bg-[#f7ead5]";
+
   return (
-    <div className="border-b border-stone-200 bg-stone-50">
+    <div className="border-b border-[#dec9a8] bg-[#fff3de]/70 p-2">
       <button
         onClick={() => onNavigate('dashboard')}
-        className="w-full px-4 py-3 text-left flex items-center gap-3 transition-colors text-stone-700 hover:bg-stone-100"
+        className={itemClass}
       >
-        <LayoutDashboard className="w-5 h-5" />
+        <LayoutDashboard className="h-4 w-4" />
         <div className="flex-1">
-          <div className="font-medium text-sm">Dashboard</div>
-          <div className="text-xs text-stone-500">Overview & statistics</div>
+          <div className="text-sm font-semibold">Dashboard</div>
+          <div className="text-[11px] text-[#7a6b57]">Overview & statistics</div>
         </div>
-        <ChevronRight className="w-4 h-4 text-stone-400" />
+        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
       </button>
 
       <button
         onClick={() => onNavigate('board')}
-        className="w-full px-4 py-3 text-left flex items-center gap-3 transition-colors text-stone-700 hover:bg-stone-100 border-t border-stone-200"
+        className={itemClass}
       >
-        <Target className="w-5 h-5" />
+        <Target className="h-4 w-4" />
         <div className="flex-1">
-          <div className="font-medium text-sm">Board</div>
-          <div className="text-xs text-stone-500">Manage your items</div>
+          <div className="text-sm font-semibold">Board</div>
+          <div className="text-[11px] text-[#7a6b57]">Manage your items</div>
         </div>
-        <ChevronRight className="w-4 h-4 text-stone-400" />
+        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
       </button>
 
       <button
         onClick={() => onNavigate('timeline')}
-        className="w-full px-4 py-3 text-left flex items-center gap-3 transition-colors text-stone-700 hover:bg-stone-100 border-t border-stone-200"
+        className={itemClass}
       >
-        <Calendar className="w-5 h-5" />
+        <Calendar className="h-4 w-4" />
         <div className="flex-1">
-          <div className="font-medium text-sm">Timeline</div>
-          <div className="text-xs text-stone-500">View activity history</div>
+          <div className="text-sm font-semibold">Timeline</div>
+          <div className="text-[11px] text-[#7a6b57]">View activity history</div>
         </div>
-        <ChevronRight className="w-4 h-4 text-stone-400" />
+        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
       </button>
 
       <button
         onClick={() => onNavigate('reflection')}
-        className="w-full px-4 py-3 text-left flex items-center gap-3 transition-colors text-stone-700 hover:bg-stone-100 border-t border-stone-200"
+        className={itemClass}
       >
-        <BookOpen className="w-5 h-5" />
+        <BookOpen className="h-4 w-4" />
         <div className="flex-1">
-          <div className="font-medium text-sm">Daily Reflection</div>
-          <div className="text-xs text-stone-500">Track your growth</div>
+          <div className="text-sm font-semibold">Daily Reflection</div>
+          <div className="text-[11px] text-[#7a6b57]">Track your growth</div>
         </div>
-        <ChevronRight className="w-4 h-4 text-stone-400" />
+        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
       </button>
 
       <button
         onClick={() => onNavigate('meta-skills')}
-        className="w-full px-4 py-3 text-left flex items-center gap-3 transition-colors text-stone-700 hover:bg-stone-100 border-t border-stone-200"
+        className={itemClass}
       >
-        <Brain className="w-5 h-5" />
+        <Brain className="h-4 w-4" />
         <div className="flex-1">
-          <div className="font-medium text-sm">Meta-Skills</div>
-          <div className="text-xs text-stone-500">Browse & manage skills</div>
+          <div className="text-sm font-semibold">Meta-Skills</div>
+          <div className="text-[11px] text-[#7a6b57]">Browse & manage skills</div>
         </div>
-        <ChevronRight className="w-4 h-4 text-stone-400" />
+        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
       </button>
     </div>
   );

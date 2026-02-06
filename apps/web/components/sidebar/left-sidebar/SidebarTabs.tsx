@@ -10,14 +10,14 @@ interface SidebarTabsProps {
 
 export function SidebarTabs({ activeView, onTabChange, notificationCount }: SidebarTabsProps) {
   return (
-    <div className="flex gap-2 mb-4">
+    <div className="mb-3 grid grid-cols-3 gap-1.5">
       <button
         onClick={() => onTabChange('priorities')}
         className={cn(
-          'flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
+          'rounded-lg px-2 py-1.5 text-[11px] font-semibold transition-colors',
           activeView === 'priorities'
-            ? 'bg-amber-100 text-amber-900'
-            : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            ? 'bg-[#f2d6ad] text-[#6b4320]'
+            : 'bg-[#f7eddc] text-[#756652] hover:bg-[#f2e1c7]'
         )}
       >
         Priorities
@@ -25,15 +25,15 @@ export function SidebarTabs({ activeView, onTabChange, notificationCount }: Side
       <button
         onClick={() => onTabChange('notifications')}
         className={cn(
-          'flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors relative',
+          'relative rounded-lg px-2 py-1.5 text-[11px] font-semibold transition-colors',
           activeView === 'notifications'
-            ? 'bg-amber-100 text-amber-900'
-            : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            ? 'bg-[#f2d6ad] text-[#6b4320]'
+            : 'bg-[#f7eddc] text-[#756652] hover:bg-[#f2e1c7]'
         )}
       >
         Alerts
         {notificationCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+          <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#b73b30] text-[10px] font-semibold text-white">
             {notificationCount}
           </span>
         )}
@@ -41,10 +41,10 @@ export function SidebarTabs({ activeView, onTabChange, notificationCount }: Side
       <button
         onClick={() => onTabChange('daily')}
         className={cn(
-          'flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
+          'rounded-lg px-2 py-1.5 text-[11px] font-semibold transition-colors',
           activeView === 'daily'
-            ? 'bg-amber-100 text-amber-900'
-            : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            ? 'bg-[#f2d6ad] text-[#6b4320]'
+            : 'bg-[#f7eddc] text-[#756652] hover:bg-[#f2e1c7]'
         )}
       >
         Today

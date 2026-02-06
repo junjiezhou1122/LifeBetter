@@ -8,23 +8,23 @@ interface ItemSidebarHeaderProps {
 
 export function ItemSidebarHeader({ isEditing, onClose, onSave }: ItemSidebarHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 bg-stone-50">
-      <h2 className="text-lg font-semibold text-stone-900">Item Details</h2>
+    <div className="flex items-center justify-between border-b border-[#dec9a8] bg-[linear-gradient(120deg,#fff7ea,#f8e9d0)] px-4 py-3">
+      <h2 className="lb-display text-lg font-semibold text-[#2e2418]">Item Details</h2>
       <div className="flex items-center gap-2">
         {isEditing && (
           <button
             onClick={onSave}
-            className="px-3 py-1.5 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition-colors flex items-center gap-2"
+            className="flex items-center gap-1.5 rounded-md bg-[#d26a3b] px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:bg-[#bb5a2f]"
           >
-            <Save className="w-4 h-4" />
+            <Save className="h-3.5 w-3.5" />
             Save
           </button>
         )}
         <button
           onClick={onClose}
-          className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
+          className="rounded-md p-1.5 text-[#8e7e67] transition-colors hover:bg-white/70 hover:text-[#5f513e]"
         >
-          <X className="w-4 h-4" />
+          <X className="h-3.5 w-3.5" />
         </button>
       </div>
     </div>

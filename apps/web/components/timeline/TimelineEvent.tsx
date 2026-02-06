@@ -1,4 +1,4 @@
-import { Calendar, Clock, Plus, Edit, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Clock, Plus, Edit, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TimelineItem {
@@ -20,30 +20,30 @@ export function TimelineEvent({ item }: TimelineEventProps) {
   const getEventIcon = (type: string) => {
     switch (type) {
       case 'created':
-        return <Plus className="w-4 h-4 text-amber-500" />;
+        return <Plus className="w-3.5 h-3.5 text-[#b36d2e]" />;
       case 'updated':
-        return <Edit className="w-4 h-4 text-stone-600" />;
+        return <Edit className="w-3.5 h-3.5 text-[#615646]" />;
       case 'completed':
-        return <CheckCircle2 className="w-4 h-4 text-green-600" />;
+        return <CheckCircle2 className="w-3.5 h-3.5 text-[#2f7b65]" />;
       case 'status_change':
-        return <AlertCircle className="w-4 h-4 text-blue-600" />;
+        return <AlertCircle className="w-3.5 h-3.5 text-[#2f6283]" />;
       default:
-        return <Clock className="w-4 h-4 text-stone-400" />;
+        return <Clock className="w-3.5 h-3.5 text-[#8d7f6a]" />;
     }
   };
 
   const getEventColor = (type: string) => {
     switch (type) {
       case 'created':
-        return 'bg-amber-100 border-amber-200';
+        return 'bg-[#faefde] border-[#ebd3aa]';
       case 'updated':
-        return 'bg-stone-100 border-stone-200';
+        return 'bg-[#f8f2e8] border-[#dfcfb4]';
       case 'completed':
-        return 'bg-green-100 border-green-200';
+        return 'bg-[#e8f4ec] border-[#b8ddcb]';
       case 'status_change':
-        return 'bg-blue-100 border-blue-200';
+        return 'bg-[#e8f1f8] border-[#c2d8ea]';
       default:
-        return 'bg-stone-100 border-stone-200';
+        return 'bg-[#f8f2e8] border-[#dfcfb4]';
     }
   };
 
@@ -67,25 +67,25 @@ export function TimelineEvent({ item }: TimelineEventProps) {
   return (
     <div
       className={cn(
-        'relative bg-white rounded-lg border p-4 hover:shadow-md transition-all',
+        'relative rounded-lg border bg-white/90 p-3 transition-all hover:shadow-[0_8px_18px_rgba(95,67,31,0.12)]',
         getEventColor(item.type)
       )}
     >
-      <div className="absolute -left-[29px] top-5 w-4 h-4 rounded-full bg-white border-2 border-amber-500" />
+      <div className="absolute -left-[17px] top-4 h-3.5 w-3.5 rounded-full border-2 border-[#cf7a41] bg-white" />
 
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white border border-stone-200 flex items-center justify-center">
+      <div className="flex items-start gap-2.5">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#decfb8] bg-white">
           {getEventIcon(item.type)}
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-medium text-stone-500 uppercase">
+          <div className="mb-1 flex items-center gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-[#756754]">
               {item.type.replace('_', ' ')}
             </span>
             {item.status && (
               <span className={cn(
-                'text-xs px-2 py-0.5 rounded-full font-medium',
+                'rounded-full px-1.5 py-0.5 text-[10px] font-semibold',
                 getStatusColor(item.status)
               )}>
                 {item.status.replace('_', ' ')}
@@ -93,18 +93,18 @@ export function TimelineEvent({ item }: TimelineEventProps) {
             )}
           </div>
 
-          <h3 className="text-sm font-medium text-stone-900 mb-1">
+          <h3 className="mb-1 text-sm font-semibold text-[#2f271c]">
             {item.title}
           </h3>
 
           {item.description && (
-            <p className="text-xs text-stone-600 mb-2">
+            <p className="mb-1.5 text-xs text-[#6f6352]">
               {item.description}
             </p>
           )}
 
-          <div className="flex items-center gap-2 text-xs text-stone-500">
-            <Clock className="w-3 h-3" />
+          <div className="flex items-center gap-1.5 text-[11px] text-[#7e725f]">
+            <Clock className="h-3 w-3" />
             <span>
               {new Date(item.timestamp).toLocaleTimeString('en-US', {
                 hour: '2-digit',

@@ -9,27 +9,27 @@ interface ItemSidebarTabsProps {
 
 export function ItemSidebarTabs({ activeTab, onTabChange }: ItemSidebarTabsProps) {
   return (
-    <div className="flex gap-2 px-6 border-b border-stone-200 bg-white">
+    <div className="grid grid-cols-2 gap-1.5 border-b border-[#dec9a8] bg-[#fff3de]/70 px-4 py-2">
       <button
         onClick={() => onTabChange('details')}
-        className={`px-4 py-3 text-sm font-medium transition-colors ${
+        className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
           activeTab === 'details'
-            ? 'text-amber-600 border-b-2 border-amber-600'
-            : 'text-stone-600 hover:text-stone-900'
+            ? 'bg-[#f2d6ad] text-[#6b4320]'
+            : 'bg-[#f7eddc] text-[#756652] hover:bg-[#f2e1c7]'
         }`}
       >
-        <AlertCircle className="w-4 h-4 inline mr-2" />
+        <AlertCircle className="mr-1.5 inline h-3.5 w-3.5" />
         Details
       </button>
       <button
         onClick={() => onTabChange('notes')}
-        className={`px-4 py-3 text-sm font-medium transition-colors ${
+        className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
           activeTab === 'notes'
-            ? 'text-amber-600 border-b-2 border-amber-600'
-            : 'text-stone-600 hover:text-stone-900'
+            ? 'bg-[#f2d6ad] text-[#6b4320]'
+            : 'bg-[#f7eddc] text-[#756652] hover:bg-[#f2e1c7]'
         }`}
       >
-        <FileText className="w-4 h-4 inline mr-2" />
+        <FileText className="mr-1.5 inline h-3.5 w-3.5" />
         Notes
       </button>
     </div>

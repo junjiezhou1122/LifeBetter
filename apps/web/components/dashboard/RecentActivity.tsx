@@ -32,23 +32,23 @@ export function RecentActivity({ recentItems }: RecentActivityProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-stone-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-stone-900">Recent Activity</h3>
-        <Clock className="w-5 h-5 text-stone-400" />
+    <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-4 shadow-[0_6px_18px_rgba(95,67,31,0.1)]">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-base font-semibold text-[#2e2418]">Recent Activity</h3>
+        <Clock className="h-4 w-4 text-[#897b66]" />
       </div>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {recentItems.length === 0 ? (
-          <p className="text-sm text-stone-500 text-center py-8">No recent activity</p>
+          <p className="py-6 text-center text-sm text-[#7a6b57]">No recent activity</p>
         ) : (
           recentItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between p-3 rounded-lg hover:bg-stone-50 transition-colors"
+              className="flex items-center justify-between rounded-lg border border-[#e6d7c0] bg-[#fffaf1] p-2.5 transition-colors hover:bg-[#f8eddc]"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-stone-900 truncate">{item.title}</p>
-                <p className="text-xs text-stone-500">
+                <p className="truncate text-sm font-semibold text-[#2f271c]">{item.title}</p>
+                <p className="text-[11px] text-[#7e725f]">
                   {new Date(item.updatedAt).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
@@ -57,7 +57,7 @@ export function RecentActivity({ recentItems }: RecentActivityProps) {
                   })}
                 </p>
               </div>
-              <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)}`}>
+              <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${getStatusColor(item.status)}`}>
                 {getStatusLabel(item.status)}
               </span>
             </div>

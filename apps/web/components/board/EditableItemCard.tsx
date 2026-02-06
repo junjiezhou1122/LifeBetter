@@ -8,10 +8,10 @@ interface EditableItemCardProps {
 }
 
 const priorities = [
-  { value: 'low', label: 'Low', color: 'bg-green-500' },
-  { value: 'medium', label: 'Medium', color: 'bg-amber-500' },
-  { value: 'high', label: 'High', color: 'bg-orange-500' },
-  { value: 'urgent', label: 'Urgent', color: 'bg-red-500' }
+  { value: 'low', label: 'Low', color: 'bg-[#2f7b65]' },
+  { value: 'medium', label: 'Medium', color: 'bg-[#cc8e2e]' },
+  { value: 'high', label: 'High', color: 'bg-[#cf6b35]' },
+  { value: 'urgent', label: 'Urgent', color: 'bg-[#b73b30]' }
 ];
 
 export function EditableItemCard({ onSave, onCancel }: EditableItemCardProps) {
@@ -42,17 +42,16 @@ export function EditableItemCard({ onSave, onCancel }: EditableItemCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border-2 border-stone-400 p-4 mb-3 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
-      {/* Priority Selector */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+    <div className="mb-2.5 rounded-xl border border-[#cfb48e] bg-[linear-gradient(180deg,#fffefb,#fff5e8)] p-2.5 shadow-[0_8px_20px_rgba(110,84,45,0.14)] animate-in fade-in slide-in-from-top-2 duration-200">
+      <div className="mb-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
         {priorities.map(p => (
           <button
             key={p.value}
             onClick={() => setPriority(p.value)}
-            className={`w-full px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+            className={`w-full rounded-md px-2 py-1 text-[11px] font-semibold transition-all ${
               priority === p.value
                 ? `${p.color} text-white shadow-sm`
-                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                : 'border border-[#ddcbaf] bg-white/70 text-[#6b5e4c] hover:bg-white'
             }`}
           >
             {p.label}
@@ -60,43 +59,40 @@ export function EditableItemCard({ onSave, onCancel }: EditableItemCardProps) {
         ))}
       </div>
 
-      {/* Title Input */}
       <textarea
         ref={titleRef}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Item title..."
-        className="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-transparent resize-none placeholder:text-stone-400"
-        rows={2}
+        className="lb-input w-full resize-none rounded-lg px-2.5 py-2 text-sm placeholder:text-[#8d7f6a]"
+        rows={1}
       />
 
-      {/* Description Input */}
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Description (optional)..."
-        className="w-full px-3 py-2 text-sm border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-transparent resize-none mt-2 placeholder:text-stone-400"
+        className="lb-input mt-1.5 w-full resize-none rounded-lg px-2.5 py-1.5 text-xs placeholder:text-[#8d7f6a]"
         rows={2}
       />
 
-      {/* Actions */}
-      <div className="mt-3 pt-3 border-t border-stone-100 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-xs text-stone-500 leading-snug">
+      <div className="mt-2 flex flex-col gap-1.5 border-t border-[#eadbc4] pt-2 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-[11px] leading-snug text-[#7b6f5d]">
           ⌘+Enter to save • Esc to cancel
         </span>
-        <div className="flex gap-2 justify-end">
+        <div className="flex justify-end gap-1.5">
           <button
             onClick={onCancel}
-            className="px-3 py-1.5 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-lg transition-colors"
+            className="rounded-md px-2.5 py-1 text-xs font-medium text-[#6d5f4f] transition-colors hover:bg-[#f7ead6] hover:text-[#42372a]"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={!title.trim()}
-            className="px-3 py-1.5 text-sm bg-stone-800 text-white rounded-lg hover:bg-stone-900 transition-colors disabled:bg-stone-300 disabled:cursor-not-allowed"
+            className="rounded-md bg-[#d26a3b] px-2.5 py-1 text-xs font-semibold text-white transition-colors hover:bg-[#bb5a2f] disabled:cursor-not-allowed disabled:bg-[#d5c7b4]"
           >
             Save
           </button>

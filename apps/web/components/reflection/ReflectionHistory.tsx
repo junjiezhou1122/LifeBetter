@@ -87,22 +87,21 @@ export function ReflectionHistory({ onEdit }: ReflectionHistoryProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-stone-600">Loading reflections...</div>
+        <div className="text-[#6f6352]">Loading reflections...</div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Reflections List */}
+    <div className="space-y-3">
       {reflections.length === 0 ? (
-        <div className="bg-white rounded-xl border border-stone-200 p-12 text-center">
-          <BookOpen className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-stone-900 mb-2">No reflections yet</h3>
-          <p className="text-stone-600">Start your reflection journey today!</p>
+        <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-8 text-center shadow-[0_8px_20px_rgba(95,67,31,0.1)]">
+          <BookOpen className="mx-auto mb-3 h-12 w-12 text-[#c8b495]" />
+          <h3 className="mb-1 text-lg font-semibold text-[#2f271c]">No reflections yet</h3>
+          <p className="text-sm text-[#7a6b57]">Start your reflection journey today!</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {reflections.map((reflection) => {
             const isExpanded = expandedId === reflection.id;
             const preview = reflection.content.split('\n').find(line => line.trim() && !line.startsWith('#')) || '';
@@ -110,19 +109,17 @@ export function ReflectionHistory({ onEdit }: ReflectionHistoryProps) {
             return (
               <div
                 key={reflection.id}
-                className="bg-white rounded-xl border border-stone-200 overflow-hidden hover:shadow-md transition-all"
+                className="overflow-hidden rounded-xl border border-[#dbc9ad] bg-white/85 transition-all hover:shadow-[0_8px_18px_rgba(95,67,31,0.12)]"
               >
-                {/* Header */}
                 <div
-                  className="p-4 cursor-pointer"
+                  className="cursor-pointer p-3"
                   onClick={() => toggleExpand(reflection.id)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      {/* Date */}
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-stone-400" />
-                        <span className="font-semibold text-stone-900">
+                        <Calendar className="h-4 w-4 text-[#8e7e67]" />
+                        <span className="text-sm font-semibold text-[#2f271c]">
                           {new Date(reflection.date).toLocaleDateString('en-US', {
                             weekday: 'short',
                             year: 'numeric',
@@ -139,39 +136,37 @@ export function ReflectionHistory({ onEdit }: ReflectionHistoryProps) {
                           e.stopPropagation();
                           onEdit(reflection);
                         }}
-                        className="p-2 text-stone-400 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
+                        className="rounded-md p-1.5 text-[#8c7c66] transition-colors hover:bg-[#f4e6d1] hover:text-[#8a5529]"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDelete(reflection.id);
                         }}
-                        className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="rounded-md p-1.5 text-[#8c7c66] transition-colors hover:bg-[#f8e5e2] hover:text-[#a63b31]"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                       {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-stone-400" />
+                        <ChevronUp className="h-4 w-4 text-[#8c7c66]" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-stone-400" />
+                        <ChevronDown className="h-4 w-4 text-[#8c7c66]" />
                       )}
                     </div>
                   </div>
 
-                  {/* Preview */}
                   {!isExpanded && (
-                    <p className="mt-2 text-sm text-stone-600 line-clamp-2">
+                    <p className="mt-1 line-clamp-2 text-xs text-[#6f6352]">
                       {preview}
                     </p>
                   )}
                 </div>
 
-                {/* Expanded Content */}
                 {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-stone-100">
-                    <div className="prose prose-sm max-w-none mt-4">
+                  <div className="border-t border-[#eadbc4] px-3 pb-3">
+                    <div className="prose prose-sm mt-3 max-w-none">
                       {renderMarkdown(reflection.content)}
                     </div>
                   </div>

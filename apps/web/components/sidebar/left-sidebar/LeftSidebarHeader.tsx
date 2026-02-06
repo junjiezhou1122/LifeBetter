@@ -6,17 +6,17 @@ interface LeftSidebarHeaderProps {
 
 export function LeftSidebarHeader({ onClose }: LeftSidebarHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-stone-200 bg-stone-50">
+    <div className="flex items-center justify-between border-b border-[#dec9a8] bg-[linear-gradient(120deg,#fff7ea,#f8e9d0)] px-3 py-2.5">
       <div className="flex items-center gap-2">
-        <Home className="w-5 h-5 text-stone-700" />
-        <h2 className="text-base font-semibold text-stone-900">LifeBetter</h2>
+        <Home className="h-[18px] w-[18px] text-[#6f4c24]" />
+        <h2 className="lb-display text-base font-semibold text-[#2e2418]">LifeBetter</h2>
       </div>
       <button
         onClick={onClose}
-        className="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
+        className="rounded-md p-1 text-[#8e7e67] transition-colors hover:bg-white/70 hover:text-[#5f513e]"
         aria-label="Close sidebar"
       >
-        <X className="w-4 h-4" />
+        <X className="h-3.5 w-3.5" />
       </button>
     </div>
   );

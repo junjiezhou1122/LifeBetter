@@ -29,18 +29,11 @@ interface ItemCardProps {
   onDelete: () => void;
 }
 
-const priorityColors: Record<string, string> = {
-  urgent: 'bg-red-500',
-  high: 'bg-orange-500',
-  medium: 'bg-amber-500',
-  low: 'bg-green-500'
-};
-
 const priorityDots: Record<string, string> = {
-  urgent: 'bg-red-500',
-  high: 'bg-orange-500',
-  medium: 'bg-amber-500',
-  low: 'bg-green-500'
+  urgent: 'bg-[#b73b30]',
+  high: 'bg-[#cf6b35]',
+  medium: 'bg-[#cc8e2e]',
+  low: 'bg-[#2f7b65]'
 };
 
 export function ItemCard({ item, childCount, onClick, onDrillDown, onBreakdown, onDelete }: ItemCardProps) {
@@ -78,39 +71,36 @@ export function ItemCard({ item, childCount, onClick, onDrillDown, onBreakdown, 
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-xl border border-stone-200 p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
+      className="group cursor-pointer rounded-xl border border-[#d5c3a5] bg-[linear-gradient(180deg,#fffefb,#fff8ed)] p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_18px_rgba(95,67,31,0.12)]"
     >
-      {/* Title and Child Count */}
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <h3 className="text-sm font-medium text-stone-900 flex-1 line-clamp-2 leading-relaxed">
+      <div className="mb-2.5 flex items-start justify-between gap-2">
+        <h3 className="flex-1 line-clamp-2 text-[13px] font-semibold leading-snug text-[#33281c]">
           {item.title}
         </h3>
         {hasChildren && (
           <button
             onClick={handleChildrenClick}
-            className="flex items-center gap-1 text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded-md shrink-0 hover:bg-stone-200 hover:text-stone-700 transition-colors"
+            className="flex shrink-0 items-center gap-1 rounded-md border border-[#d6c4a7] bg-white/80 px-1.5 py-0.5 text-[11px] text-[#6f614f] transition-colors hover:bg-white hover:text-[#514530]"
             title="View sub-items"
           >
-            <ChevronRight className="w-3 h-3" />
+            <ChevronRight className="h-3 w-3" />
             <span>{childCount}</span>
           </button>
         )}
       </div>
 
-      {/* Description (if exists) */}
       {item.description && (
-        <p className="text-xs text-stone-600 mb-3 leading-relaxed line-clamp-2 group-hover:line-clamp-none transition-all">
+        <p className="mb-2 line-clamp-2 text-[11.5px] leading-relaxed text-[#6b5f50]">
           {item.description}
         </p>
       )}
 
-      {/* Tags */}
       {item.tags && item.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-3">
+        <div className="mb-2 flex flex-wrap gap-1">
           {item.tags.map((tag, index) => (
             <span
               key={index}
-              className="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-md"
+              className="rounded-md border border-[#dfcfb4] bg-[#fdf2e3] px-1.5 py-0.5 text-[10px] font-medium text-[#705a3f]"
             >
               {tag}
             </span>
@@ -118,48 +108,44 @@ export function ItemCard({ item, childCount, onClick, onDrillDown, onBreakdown, 
         </div>
       )}
 
-      {/* Blocking/Blocked Indicators */}
       {(isBlocked || isBlocking) && (
-        <div className="space-y-1.5 mb-3">
+        <div className="mb-2 space-y-1">
           {isBlocked && (
-            <div className="flex items-center gap-1.5 text-xs text-red-600 bg-red-50 px-2 py-1 rounded-md">
-              <AlertCircle className="w-3 h-3" />
+            <div className="flex items-center gap-1 rounded-md border border-[#efc8c2] bg-[#fbebe9] px-1.5 py-0.5 text-[10.5px] text-[#9b3a32]">
+              <AlertCircle className="h-3 w-3" />
               <span>Blocked by {item.blockedBy!.length}</span>
             </div>
           )}
           {isBlocking && (
-            <div className="flex items-center gap-1.5 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md">
-              <AlertCircle className="w-3 h-3" />
+            <div className="flex items-center gap-1 rounded-md border border-[#efddbf] bg-[#fbf3e6] px-1.5 py-0.5 text-[10.5px] text-[#95642a]">
+              <AlertCircle className="h-3 w-3" />
               <span>Blocking {item.blocking!.length}</span>
             </div>
           )}
         </div>
       )}
 
-      {/* Footer */}
-      <div className="flex items-center justify-between pt-3 border-t border-stone-100">
-        <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${priorityDots[item.priority]}`} />
-          <span className="text-xs text-stone-500 capitalize">{item.priority}</span>
+      <div className="flex items-center justify-between border-t border-[#eadbc4] pt-2">
+        <div className="flex items-center gap-1.5">
+          <div className={`h-2 w-2 rounded-full ${priorityDots[item.priority]}`} />
+          <span className="text-[11px] capitalize text-[#746652]">{item.priority}</span>
         </div>
 
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {/* AI Breakdown Button */}
+        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={handleBreakdown}
-            className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-md transition-colors"
+            className="rounded-md p-1 text-[#85745f] transition-colors hover:bg-[#f4e6d1] hover:text-[#5e4f3a]"
             title="AI Breakdown"
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="h-3.5 w-3.5" />
           </button>
 
-          {/* Delete Button */}
           <button
             onClick={handleDelete}
-            className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+            className="rounded-md p-1 text-[#85745f] transition-colors hover:bg-[#f8e5e2] hover:text-[#a63b31]"
             title="Delete"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>

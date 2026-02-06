@@ -33,10 +33,6 @@ export function ItemDetailSidebar({ item, onClose, onUpdate }: ItemDetailSidebar
   const [editedItem, setEditedItem] = useState<Item>(() => normalizeItem(item));
 
   useEffect(() => {
-    setEditedItem(normalizeItem(item));
-  }, [item]);
-
-  useEffect(() => {
     fetch('/api/meta-skills')
       .then(res => res.json())
       .then(data => setMetaSkills(data))
@@ -85,7 +81,7 @@ export function ItemDetailSidebar({ item, onClose, onUpdate }: ItemDetailSidebar
   };
 
   return (
-    <div className="fixed top-0 right-0 bottom-0 w-[500px] bg-white border-l border-stone-200 shadow-xl z-50 flex flex-col">
+    <div className="fixed bottom-0 right-0 top-0 z-50 flex w-[26rem] max-w-[92vw] flex-col border-l border-[#d7c2a3] bg-[linear-gradient(180deg,#fffefb,#fff7ea)] shadow-[0_14px_32px_rgba(96,66,29,0.16)]">
       <ItemSidebarHeader
         isEditing={isEditing}
         onClose={onClose}
@@ -97,7 +93,7 @@ export function ItemDetailSidebar({ item, onClose, onUpdate }: ItemDetailSidebar
         onTabChange={setActiveTab}
       />
 
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div className="lb-scrollbar flex-1 overflow-y-auto px-4 py-4">
         {activeTab === 'details' ? (
           <ItemDetailsContent
             item={item}
@@ -135,7 +131,7 @@ export function ItemDetailSidebar({ item, onClose, onUpdate }: ItemDetailSidebar
           isEditing={isEditing}
           onEdit={() => setIsEditing(true)}
           onCancel={() => {
-            setEditedItem(item);
+            setEditedItem(normalizeItem(item));
             setIsEditing(false);
           }}
           onSave={handleSave}

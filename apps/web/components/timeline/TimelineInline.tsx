@@ -78,20 +78,20 @@ export function TimelineInline() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-xl text-stone-600">Loading timeline...</div>
+        <div className="text-lg text-[#6c5f4e]">Loading timeline...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Calendar className="w-8 h-8 text-amber-500" />
-            <h1 className="text-3xl font-bold text-stone-900">Timeline</h1>
+    <div className="h-full overflow-y-auto px-4 py-4 md:px-5">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-5 rounded-2xl border border-[#dbc9ad] bg-[linear-gradient(120deg,#fffaf0,#f5ebd7)] px-4 py-3 shadow-[0_8px_24px_rgba(110,80,34,0.11)]">
+          <div className="mb-1.5 flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-[#b35a2f]" />
+            <h1 className="lb-display text-2xl font-semibold text-[#2d2114]">Timeline</h1>
           </div>
-          <p className="text-stone-600">Track all your activity and progress over time</p>
+          <p className="text-sm text-[#6f6352]">Track all your activity and progress over time</p>
         </div>
 
         <TimelineFilters
@@ -104,24 +104,24 @@ export function TimelineInline() {
         />
 
         {groupedTimeline.length === 0 ? (
-          <div className="bg-white rounded-xl border border-stone-200 p-12 text-center">
-            <Clock className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-stone-900 mb-2">No activity yet</h3>
-            <p className="text-stone-600">Start working on items to see your timeline</p>
+          <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-8 text-center shadow-[0_8px_20px_rgba(95,67,31,0.1)]">
+            <Clock className="mx-auto mb-3 h-12 w-12 text-[#c8b495]" />
+            <h3 className="mb-1 text-lg font-semibold text-[#2f271c]">No activity yet</h3>
+            <p className="text-sm text-[#7a6b57]">Start working on items to see your timeline</p>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {groupedTimeline.map((group, groupIndex) => (
               <div key={groupIndex}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="shrink-0 w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-amber-500" />
+                <div className="mb-3 flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#f6dfbc]">
+                    <Calendar className="h-4 w-4 text-[#a95a2f]" />
                   </div>
-                  <h2 className="text-lg font-semibold text-stone-900">{group.date}</h2>
-                  <div className="flex-1 h-px bg-stone-200" />
+                  <h2 className="text-base font-semibold text-[#2f271c]">{group.date}</h2>
+                  <div className="h-px flex-1 bg-[#dfcfb4]" />
                 </div>
 
-                <div className="ml-6 border-l-2 border-stone-200 pl-6 space-y-4">
+                <div className="ml-4 space-y-3 border-l-2 border-[#dfcfb4] pl-4">
                   {group.items.map((item) => (
                     <TimelineEvent key={item.id} item={item} />
                   ))}

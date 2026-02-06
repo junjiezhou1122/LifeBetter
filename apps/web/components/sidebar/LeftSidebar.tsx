@@ -77,13 +77,13 @@ export function LeftSidebar({ isOpen, onClose, onItemClick, onNavigate }: LeftSi
   if (!isOpen) return null;
 
   return (
-    <div className="fixed top-0 left-0 bottom-0 z-[60] bg-white border-r border-stone-200 w-80 shadow-lg flex flex-col">
+    <div className="fixed bottom-0 left-0 top-0 z-[60] flex w-[19rem] flex-col border-r border-[#d7c2a3] bg-[linear-gradient(180deg,#fffefb,#fff7ea)] shadow-[0_14px_32px_rgba(96,66,29,0.16)]">
       <LeftSidebarHeader onClose={onClose} />
 
       <NavigationMenu onNavigate={(view) => onNavigate?.(view)} />
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
+      <div className="lb-scrollbar flex-1 overflow-y-auto">
+        <div className="p-3">
           <SidebarTabs
             activeView={activeView}
             onTabChange={setActiveView}

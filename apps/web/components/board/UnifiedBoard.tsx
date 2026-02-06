@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { ItemDetailSidebar } from "../sidebar/item-detail/ItemDetailSidebar";
 import { MetaSkillFeedbackModal } from "../modals/MetaSkillFeedbackModal";
@@ -28,8 +27,6 @@ export function UnifiedBoard() {
 
   const {
     navigationStack,
-    currentParentId,
-    currentDepth,
     isRootLevel,
     drillDown,
     navigateToBreadcrumb,
@@ -169,13 +166,13 @@ export function UnifiedBoard() {
         isOpen={breakdownSidebar.isOpen}
         id={breakdownSidebar.id}
         title={breakdownSidebar.title}
-        parentId={currentParentId}
         onClose={closeBreakdownSidebar}
         onConfirm={handleBreakdownConfirm}
       />
 
       {detailSidebar.isOpen && detailSidebar.item && (
         <ItemDetailSidebar
+          key={detailSidebar.item.id}
           item={detailSidebar.item}
           onClose={closeDetailSidebar}
           onUpdate={(updates) =>

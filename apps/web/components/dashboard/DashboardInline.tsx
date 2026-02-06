@@ -47,17 +47,17 @@ export function DashboardInline() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-xl text-stone-600">Loading dashboard...</div>
+        <div className="text-lg text-[#6c5f4e]">Loading dashboard...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-stone-900 mb-2">Dashboard</h1>
-          <p className="text-stone-600">Overview of your tasks and progress</p>
+    <div className="h-full overflow-y-auto px-4 py-4 md:px-5">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-5 rounded-2xl border border-[#dbc9ad] bg-[linear-gradient(120deg,#fffaf0,#f5ebd7)] px-4 py-3 shadow-[0_8px_24px_rgba(110,80,34,0.11)]">
+          <h1 className="lb-display text-2xl font-semibold text-[#2d2114]">Dashboard</h1>
+          <p className="text-sm text-[#6f6352]">Overview of your tasks and progress</p>
         </div>
 
         <DashboardStatsGrid stats={stats} />

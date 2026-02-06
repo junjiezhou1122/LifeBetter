@@ -34,9 +34,9 @@ function getNotificationIcon(type: string) {
 export function NotificationList({ notifications, onDismiss, onItemClick }: NotificationListProps) {
   if (notifications.length === 0) {
     return (
-      <div className="text-center py-8 text-stone-500">
-        <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-green-100 flex items-center justify-center">
-          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="py-7 text-center text-[#7a6b57]">
+        <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#d9efe4]">
+          <svg className="h-5 w-5 text-[#2f7b65]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
@@ -46,16 +46,16 @@ export function NotificationList({ notifications, onDismiss, onItemClick }: Noti
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {notifications.map((notification) => (
         <div
           key={notification.id}
-          className="bg-white border border-stone-200 rounded-lg p-3 hover:shadow-md transition-shadow"
+          className="rounded-lg border border-[#dbc9ad] bg-white/80 p-2.5 transition-shadow hover:shadow-[0_8px_18px_rgba(95,67,31,0.12)]"
         >
-          <div className="flex items-start gap-2 mb-2">
+          <div className="mb-1.5 flex items-start gap-2">
             {getNotificationIcon(notification.type)}
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium text-stone-900">
+              <h3 className="text-xs font-semibold text-[#34281c]">
                 {notification.title}
               </h3>
             </div>
@@ -64,23 +64,23 @@ export function NotificationList({ notifications, onDismiss, onItemClick }: Noti
                 e.stopPropagation();
                 onDismiss(notification.id);
               }}
-              className="flex-shrink-0 p-1 text-stone-400 hover:text-stone-600 rounded transition-colors"
+              className="flex-shrink-0 rounded p-1 text-[#8c7c66] transition-colors hover:bg-[#f3e6d2] hover:text-[#5d4f3a]"
             >
-              <X className="w-3 h-3" />
+              <X className="h-3 w-3" />
             </button>
           </div>
 
-          <p className="text-xs text-stone-600 mb-2">
+          <p className="mb-1.5 text-[11px] text-[#6e604f]">
             {notification.message}
           </p>
 
           {notification.itemId && (
             <button
               onClick={() => onItemClick?.(notification.itemId!)}
-              className="flex items-center gap-1 text-xs text-amber-700 hover:text-amber-800 font-medium"
+              className="flex items-center gap-1 text-[11px] font-semibold text-[#8a5529] transition hover:text-[#6d3e19]"
             >
               View item
-              <ChevronRight className="w-3 h-3" />
+              <ChevronRight className="h-3 w-3" />
             </button>
           )}
         </div>

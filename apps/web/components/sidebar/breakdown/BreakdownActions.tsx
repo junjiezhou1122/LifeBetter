@@ -12,11 +12,11 @@ export function BreakdownActions({
   onConfirm
 }: BreakdownActionsProps) {
   return (
-    <div className="flex gap-3 pt-6 border-t border-stone-200">
+    <div className="flex gap-1.5 border-t border-[#dec9a8] pt-3">
       <button
         onClick={onRegenerate}
         disabled={loading}
-        className="px-4 py-2.5 border-2 border-stone-300 text-stone-700 text-sm font-semibold rounded-xl hover:bg-stone-50 hover:border-stone-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        className="rounded-lg border border-[#d9c7aa] bg-white/80 px-3 py-2 text-xs font-semibold text-[#6d5f4f] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
         aria-label="Regenerate suggestions"
       >
         Regenerate
@@ -24,7 +24,7 @@ export function BreakdownActions({
       <button
         onClick={onConfirm}
         disabled={selectedTasksCount === 0}
-        className="flex-1 px-4 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-xl hover:bg-amber-600 disabled:bg-stone-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-amber-500/20 hover:shadow-xl hover:shadow-amber-500/30"
+        className="flex-1 rounded-lg bg-[#d26a3b] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#bb5a2f] disabled:cursor-not-allowed disabled:bg-[#d5c7b4]"
         aria-label={`Create ${selectedTasksCount} sub-item${selectedTasksCount !== 1 ? 's' : ''}`}
       >
         Create {selectedTasksCount} {selectedTasksCount === 1 ? 'Item' : 'Items'}

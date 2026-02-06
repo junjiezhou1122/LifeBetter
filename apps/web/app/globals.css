@@ -1,26 +1,139 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --lb-bg: #f4efe2;
+  --lb-bg-soft: #eadfc8;
+  --lb-surface: #fffdf8;
+  --lb-surface-soft: #fff7eb;
+  --lb-ink: #1f2d37;
+  --lb-muted: #5f6d75;
+  --lb-border: #d8c5a6;
+  --lb-accent: #d26a3b;
+  --lb-accent-strong: #b95428;
+  --lb-accent-soft: #f6d6aa;
+  --lb-secondary: #0f7666;
+  --lb-danger: #b73b30;
+  --lb-shadow: 0 16px 44px rgba(96, 63, 20, 0.16);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--lb-bg);
+  --color-foreground: var(--lb-ink);
+  --font-sans: var(--font-space-grotesk);
+  --font-display: var(--font-fraunces);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background:
+    radial-gradient(circle at 15% 20%, color-mix(in oklab, var(--lb-accent-soft) 65%, transparent) 0%, transparent 42%),
+    radial-gradient(circle at 85% 5%, color-mix(in oklab, var(--lb-bg-soft) 76%, transparent) 0%, transparent 36%),
+    linear-gradient(165deg, #f8f4ea 0%, var(--lb-bg) 46%, #f2e6d0 100%);
+  color: var(--lb-ink);
+  font-family: var(--font-space-grotesk), "Trebuchet MS", sans-serif;
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--lb-accent) 35%, white);
+  color: var(--lb-ink);
+}
+
+.lb-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  letter-spacing: 0.01em;
+}
+
+.lb-surface {
+  background: linear-gradient(180deg, #fffdf9 0%, var(--lb-surface) 100%);
+  border: 1px solid color-mix(in oklab, var(--lb-border) 78%, white);
+  box-shadow: var(--lb-shadow);
+}
+
+.lb-surface-soft {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--lb-surface-soft) 74%, white) 0%,
+    color-mix(in oklab, var(--lb-surface-soft) 92%, transparent) 100%
+  );
+  border: 1px solid color-mix(in oklab, var(--lb-border) 76%, white);
+}
+
+.lb-chip {
+  border: 1px solid color-mix(in oklab, var(--lb-border) 72%, white);
+  background: color-mix(in oklab, var(--lb-surface-soft) 75%, white);
+  color: var(--lb-ink);
+}
+
+.lb-input {
+  border: 1px solid color-mix(in oklab, var(--lb-border) 76%, white);
+  background: color-mix(in oklab, white 90%, var(--lb-surface-soft));
+  color: var(--lb-ink);
+}
+
+.lb-input:focus {
+  border-color: color-mix(in oklab, var(--lb-accent) 70%, white);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--lb-accent-soft) 58%, transparent);
+  outline: none;
+}
+
+.lb-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.lb-scrollbar::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--lb-border) 72%, var(--lb-muted));
+  border-radius: 999px;
+}
+
+.lb-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseAura {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--lb-accent-soft) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in oklab, var(--lb-accent-soft) 10%, transparent);
+  }
+}
+
+.lb-rise-in {
+  animation: riseIn 360ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.lb-pulse-aura {
+  animation: pulseAura 2s ease-in-out infinite;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  font-family: var(--font-fraunces), Georgia, serif;
 }

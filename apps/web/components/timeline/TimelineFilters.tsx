@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-
 interface TimelineFiltersProps {
   dateRange: string;
   eventTypeFilter: string;
@@ -18,10 +16,10 @@ export function TimelineFilters({
   onStatusFilterChange,
 }: TimelineFiltersProps) {
   return (
-    <div className="bg-white rounded-xl border border-stone-200 p-4 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="mb-4 rounded-xl border border-[#dbc9ad] bg-white/85 p-3 shadow-[0_6px_18px_rgba(95,67,31,0.1)]">
+      <div className="grid grid-cols-1 gap-2.5 md:grid-cols-3">
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-2">
+          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
             Date Range
           </label>
           <select
@@ -29,7 +27,7 @@ export function TimelineFilters({
             onChange={(e) =>
               onDateRangeChange(e.target.value as "all" | "30d" | "7d" | "90d")
             }
-            className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+            className="lb-input w-full rounded-lg px-2.5 py-1.5 text-xs"
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
@@ -39,13 +37,13 @@ export function TimelineFilters({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-2">
+          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
             Event Type
           </label>
           <select
             value={eventTypeFilter}
             onChange={(e) => onEventTypeFilterChange(e.target.value)}
-            className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+            className="lb-input w-full rounded-lg px-2.5 py-1.5 text-xs"
           >
             <option value="all">All events</option>
             <option value="created">Created</option>
@@ -56,13 +54,13 @@ export function TimelineFilters({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-2">
+          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
             Status
           </label>
           <select
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value)}
-            className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+            className="lb-input w-full rounded-lg px-2.5 py-1.5 text-xs"
           >
             <option value="all">All statuses</option>
             <option value="backlog">Backlog</option>

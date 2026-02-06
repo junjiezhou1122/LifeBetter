@@ -8,17 +8,17 @@ interface ItemBasicInfoProps {
 }
 
 const priorities = [
-  { value: 'low', label: 'Low', color: 'bg-green-500' },
-  { value: 'medium', label: 'Medium', color: 'bg-amber-500' },
-  { value: 'high', label: 'High', color: 'bg-orange-500' },
-  { value: 'urgent', label: 'Urgent', color: 'bg-red-500' }
+  { value: 'low', label: 'Low', color: 'bg-[#2f7b65]' },
+  { value: 'medium', label: 'Medium', color: 'bg-[#cc8e2e]' },
+  { value: 'high', label: 'High', color: 'bg-[#cf6b35]' },
+  { value: 'urgent', label: 'Urgent', color: 'bg-[#b73b30]' }
 ];
 
 export function ItemBasicInfo({ item, editedItem, isEditing, onEditedItemChange }: ItemBasicInfoProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
-        <label className="block text-xs font-semibold text-stone-500 uppercase mb-2">
+        <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
           Title
         </label>
         {isEditing ? (
@@ -26,15 +26,15 @@ export function ItemBasicInfo({ item, editedItem, isEditing, onEditedItemChange 
             type="text"
             value={editedItem.title}
             onChange={(e) => onEditedItemChange({ ...editedItem, title: e.target.value })}
-            className="w-full px-3 py-2 text-base border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            className="lb-input w-full rounded-lg px-2.5 py-2 text-sm"
           />
         ) : (
-          <h3 className="text-xl font-semibold text-stone-900">{item.title}</h3>
+          <h3 className="text-lg font-semibold text-[#2f271c]">{item.title}</h3>
         )}
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-stone-500 uppercase mb-2">
+        <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
           Description
         </label>
         {isEditing ? (
@@ -42,30 +42,30 @@ export function ItemBasicInfo({ item, editedItem, isEditing, onEditedItemChange 
             value={editedItem.description || ''}
             onChange={(e) => onEditedItemChange({ ...editedItem, description: e.target.value })}
             placeholder="Brief description..."
-            className="w-full px-3 py-2 text-sm border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+            className="lb-input w-full resize-none rounded-lg px-2.5 py-2 text-xs"
             rows={3}
           />
         ) : (
-          <p className="text-sm text-stone-700 leading-relaxed">
-            {item.description || <span className="text-stone-400 italic">No description</span>}
+          <p className="text-sm leading-relaxed text-[#6e604f]">
+            {item.description || <span className="italic text-[#a09380]">No description</span>}
           </p>
         )}
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-stone-500 uppercase mb-2">
+        <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
           Priority
         </label>
         {isEditing ? (
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-1.5">
             {priorities.map(p => (
               <button
                 key={p.value}
                 onClick={() => onEditedItemChange({ ...editedItem, priority: p.value })}
-                className={`flex-1 px-3 py-2 text-xs font-semibold rounded-lg transition-all ${
+                className={`rounded-md px-2 py-1 text-[11px] font-semibold transition-all ${
                   editedItem.priority === p.value
                     ? `${p.color} text-white shadow-sm`
-                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                    : 'border border-[#ddcbaf] bg-white/70 text-[#6b5e4c] hover:bg-white'
                 }`}
               >
                 {p.label}
@@ -73,11 +73,11 @@ export function ItemBasicInfo({ item, editedItem, isEditing, onEditedItemChange 
             ))}
           </div>
         ) : (
-          <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold ${
-            item.priority === 'urgent' ? 'bg-red-100 text-red-700' :
-            item.priority === 'high' ? 'bg-orange-100 text-orange-700' :
-            item.priority === 'medium' ? 'bg-amber-100 text-amber-700' :
-            'bg-green-100 text-green-700'
+          <span className={`inline-flex items-center rounded-lg px-2 py-1 text-[11px] font-semibold ${
+            item.priority === 'urgent' ? 'bg-[#f9e9e7] text-[#9d3c33]' :
+            item.priority === 'high' ? 'bg-[#faebde] text-[#9a4d1f]' :
+            item.priority === 'medium' ? 'bg-[#faefdc] text-[#8a5b26]' :
+            'bg-[#e9f5ef] text-[#2f7b65]'
           }`}>
             {item.priority}
           </span>

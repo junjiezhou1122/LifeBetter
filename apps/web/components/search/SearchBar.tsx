@@ -94,7 +94,7 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
   return (
     <div ref={searchRef} className="relative w-full max-w-2xl">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b7c65]" />
         <input
           type="text"
           value={query}
@@ -103,19 +103,19 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
             if (results.length > 0) setShowResults(true);
           }}
           placeholder="Search items..."
-          className="w-full pl-10 pr-20 py-3 bg-white border border-stone-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent shadow-sm"
+          className="lb-input w-full rounded-xl py-2.5 pl-9 pr-20 text-sm shadow-[0_6px_18px_rgba(101,77,42,0.1)]"
         />
 
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-          {loading && <Loader2 className="w-4 h-4 text-stone-400 animate-spin" />}
+        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
+          {loading && <Loader2 className="h-4 w-4 animate-spin text-[#8b7c65]" />}
 
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'p-2 rounded-lg transition-colors',
+              'rounded-lg p-1.5 transition-colors',
               showFilters || filters.status !== 'all' || filters.priority !== 'all' || filters.depth !== 'all'
-                ? 'bg-amber-100 text-amber-700'
-                : 'text-stone-400 hover:text-stone-600 hover:bg-stone-100'
+                ? 'bg-[#f4dab4] text-[#7b4b22]'
+                : 'text-[#8b7c65] hover:text-[#6f624f] hover:bg-[#f6ead6]'
             )}
             title="Filters"
           >
@@ -129,7 +129,7 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
                 setResults([]);
                 setShowResults(false);
               }}
-              className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
+              className="rounded-lg p-1.5 text-[#8b7c65] transition-colors hover:bg-[#f6ead6] hover:text-[#6f624f]"
             >
               <X className="w-4 h-4" />
             </button>

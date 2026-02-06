@@ -26,41 +26,41 @@ export function MetaSkillCard({ skill, onDelete }: MetaSkillCardProps) {
     : 0;
 
   return (
-    <div className="bg-white rounded-xl border border-stone-200 p-5 hover:shadow-md transition-all">
-      <div className="flex items-start justify-between mb-3">
+    <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-4 transition-all hover:shadow-[0_8px_18px_rgba(95,67,31,0.12)]">
+      <div className="mb-2.5 flex items-start justify-between">
         <div className="flex items-center gap-2">
-          <Brain className="w-5 h-5 text-amber-500" />
-          <h3 className="font-semibold text-stone-900 text-base">
+          <Brain className="h-[18px] w-[18px] text-[#b35a2f]" />
+          <h3 className="text-sm font-semibold text-[#2f271c]">
             {skill.name}
           </h3>
         </div>
         <div className="flex gap-1">
           <button
             onClick={() => {}}
-            className="p-1.5 text-stone-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition-colors"
+            className="rounded-md p-1 text-[#8c7c66] transition-colors hover:bg-[#f4e6d1] hover:text-[#8a5529]"
           >
-            <Edit2 className="w-4 h-4" />
+            <Edit2 className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => onDelete(skill.id)}
-            className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+            className="rounded-md p-1 text-[#8c7c66] transition-colors hover:bg-[#f8e5e2] hover:text-[#a63b31]"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      <p className="text-sm text-stone-600 mb-4 line-clamp-3 leading-relaxed">
+      <p className="mb-3 line-clamp-3 text-xs leading-relaxed text-[#6e604f]">
         {skill.description}
       </p>
 
-      <div className="flex items-center justify-between pt-3 border-t border-stone-100">
-        <div className="flex items-center gap-4 text-xs text-stone-500">
+      <div className="flex items-center justify-between border-t border-[#eadbc4] pt-2">
+        <div className="flex items-center gap-3 text-[11px] text-[#7f725e]">
           <span>{skill.timesApplied} uses</span>
           <span className={`font-semibold ${
-            effectiveness >= 70 ? 'text-green-600' :
-            effectiveness >= 40 ? 'text-amber-600' :
-            'text-stone-500'
+            effectiveness >= 70 ? 'text-[#2f7b65]' :
+            effectiveness >= 40 ? 'text-[#8a5b26]' :
+            'text-[#7f725e]'
           }`}>
             {effectiveness}% success
           </span>

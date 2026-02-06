@@ -12,11 +12,19 @@ interface ReflectionStats {
   reflectedToday: boolean;
 }
 
+interface ReflectionItem {
+  id: string;
+  date: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export function ReflectionInline() {
   const [stats, setStats] = useState<ReflectionStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'today' | 'history'>('today');
-  const [editingReflection, setEditingReflection] = useState<any>(null);
+  const [editingReflection, setEditingReflection] = useState<ReflectionItem | undefined>(undefined);
 
   useEffect(() => {
     fetchStats();
@@ -36,11 +44,11 @@ export function ReflectionInline() {
 
   const handleSave = () => {
     fetchStats();
-    setEditingReflection(null);
+    setEditingReflection(undefined);
     setActiveTab('history');
   };
 
-  const handleEdit = (reflection: any) => {
+  const handleEdit = (reflection: ReflectionItem) => {
     setEditingReflection(reflection);
     setActiveTab('today');
   };
@@ -48,96 +56,89 @@ export function ReflectionInline() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-xl text-stone-600">Loading...</div>
+        <div className="text-lg text-[#6c5f4e]">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <BookOpen className="w-8 h-8 text-amber-500" />
-            <h1 className="text-3xl font-bold text-stone-900">Daily Reflection</h1>
+    <div className="h-full overflow-y-auto px-4 py-4 md:px-5">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-5 rounded-2xl border border-[#dbc9ad] bg-[linear-gradient(120deg,#fffaf0,#f5ebd7)] px-4 py-3 shadow-[0_8px_24px_rgba(110,80,34,0.11)]">
+          <div className="mb-1.5 flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-[#b35a2f]" />
+            <h1 className="lb-display text-2xl font-semibold text-[#2d2114]">Daily Reflection</h1>
           </div>
-          <p className="text-stone-600">Track your progress, learnings, and growth every day</p>
+          <p className="text-sm text-[#6f6352]">Track your progress, learnings, and growth every day</p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {/* Current Streak */}
-          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-amber-200 p-6">
-            <div className="flex items-center justify-between mb-2">
-              <Flame className="w-8 h-8 text-orange-500" />
-              <span className="text-xs font-medium text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+        <div className="mb-5 grid grid-cols-1 gap-2.5 md:grid-cols-3">
+          <div className="rounded-xl border border-[#e7cda4] bg-[linear-gradient(135deg,#faeed8,#f6dfbe)] p-4">
+            <div className="mb-1 flex items-center justify-between">
+              <Flame className="h-5 w-5 text-[#b35a2f]" />
+              <span className="rounded-full bg-[#f6d8ae] px-1.5 py-0.5 text-[10px] font-semibold text-[#7a4a1e]">
                 Current
               </span>
             </div>
-            <div className="text-3xl font-bold text-stone-900 mb-1">{stats?.currentStreak || 0}</div>
-            <div className="text-sm text-stone-600">Day Streak</div>
+            <div className="mb-0.5 text-2xl font-bold text-[#2f271c]">{stats?.currentStreak || 0}</div>
+            <div className="text-xs font-medium uppercase tracking-wide text-[#7a6b57]">Day Streak</div>
           </div>
 
-          {/* Longest Streak */}
-          <div className="bg-white rounded-xl border border-stone-200 p-6">
-            <div className="flex items-center justify-between mb-2">
-              <TrendingUp className="w-8 h-8 text-amber-500" />
+          <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-4">
+            <div className="mb-1 flex items-center justify-between">
+              <TrendingUp className="h-5 w-5 text-[#b35a2f]" />
             </div>
-            <div className="text-3xl font-bold text-stone-900 mb-1">{stats?.longestStreak || 0}</div>
-            <div className="text-sm text-stone-600">Longest Streak</div>
+            <div className="mb-0.5 text-2xl font-bold text-[#2f271c]">{stats?.longestStreak || 0}</div>
+            <div className="text-xs font-medium uppercase tracking-wide text-[#7a6b57]">Longest Streak</div>
           </div>
 
-          {/* Total Reflections */}
-          <div className="bg-white rounded-xl border border-stone-200 p-6">
-            <div className="flex items-center justify-between mb-2">
-              <Calendar className="w-8 h-8 text-amber-500" />
+          <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-4">
+            <div className="mb-1 flex items-center justify-between">
+              <Calendar className="h-5 w-5 text-[#b35a2f]" />
             </div>
-            <div className="text-3xl font-bold text-stone-900 mb-1">{stats?.totalReflections || 0}</div>
-            <div className="text-sm text-stone-600">Total Reflections</div>
+            <div className="mb-0.5 text-2xl font-bold text-[#2f271c]">{stats?.totalReflections || 0}</div>
+            <div className="text-xs font-medium uppercase tracking-wide text-[#7a6b57]">Total Reflections</div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="mb-4 flex gap-1.5">
           <button
             onClick={() => {
               setActiveTab('today');
-              setEditingReflection(null);
+              setEditingReflection(undefined);
             }}
-            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${
+            className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
               activeTab === 'today'
-                ? 'bg-amber-500 text-white shadow-lg'
-                : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50'
+                ? 'bg-[#d26a3b] text-white shadow-[0_8px_18px_rgba(95,67,31,0.2)]'
+                : 'border border-[#dbc9ad] bg-white/85 text-[#6f6352] hover:bg-[#f9efde]'
             }`}
           >
-            <div className="flex items-center justify-center gap-2">
-              <Plus className="w-5 h-5" />
+            <div className="flex items-center justify-center gap-1.5">
+              <Plus className="h-4 w-4" />
               {stats?.reflectedToday && !editingReflection ? 'Update Today' : 'New Reflection'}
             </div>
           </button>
           <button
             onClick={() => setActiveTab('history')}
-            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${
+            className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
               activeTab === 'history'
-                ? 'bg-amber-500 text-white shadow-lg'
-                : 'bg-white text-stone-700 border border-stone-200 hover:bg-stone-50'
+                ? 'bg-[#d26a3b] text-white shadow-[0_8px_18px_rgba(95,67,31,0.2)]'
+                : 'border border-[#dbc9ad] bg-white/85 text-[#6f6352] hover:bg-[#f9efde]'
             }`}
           >
-            <div className="flex items-center justify-center gap-2">
-              <Calendar className="w-5 h-5" />
+            <div className="flex items-center justify-center gap-1.5">
+              <Calendar className="h-4 w-4" />
               History
             </div>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="bg-white rounded-xl border border-stone-200 p-6">
+        <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-4 shadow-[0_8px_20px_rgba(95,67,31,0.1)]">
           {activeTab === 'today' ? (
             <div>
               {editingReflection && (
-                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <p className="text-sm text-amber-800">
+                <div className="mb-3 rounded-lg border border-[#e8cb9c] bg-[#faedd8] p-2.5">
+                  <p className="text-xs font-medium text-[#7a4a1e]">
                     Editing reflection from {new Date(editingReflection.date).toLocaleDateString()}
                   </p>
                 </div>
