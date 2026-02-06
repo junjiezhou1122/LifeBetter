@@ -114,7 +114,7 @@ export function TimelineInline() {
             {groupedTimeline.map((group, groupIndex) => (
               <div key={groupIndex}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center">
                     <Calendar className="w-6 h-6 text-amber-500" />
                   </div>
                   <h2 className="text-lg font-semibold text-stone-900">{group.date}</h2>

@@ -1,10 +1,10 @@
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 interface TimelineFiltersProps {
   dateRange: string;
   eventTypeFilter: string;
   statusFilter: string;
-  onDateRangeChange: (value: string) => void;
+  onDateRangeChange: (value: "all" | "30d" | "7d" | "90d") => void;
   onEventTypeFilterChange: (value: string) => void;
   onStatusFilterChange: (value: string) => void;
 }
@@ -15,16 +15,20 @@ export function TimelineFilters({
   statusFilter,
   onDateRangeChange,
   onEventTypeFilterChange,
-  onStatusFilterChange
+  onStatusFilterChange,
 }: TimelineFiltersProps) {
   return (
     <div className="bg-white rounded-xl border border-stone-200 p-4 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-2">Date Range</label>
+          <label className="block text-sm font-medium text-stone-700 mb-2">
+            Date Range
+          </label>
           <select
             value={dateRange}
-            onChange={(e) => onDateRangeChange(e.target.value)}
+            onChange={(e) =>
+              onDateRangeChange(e.target.value as "all" | "30d" | "7d" | "90d")
+            }
             className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
           >
             <option value="7d">Last 7 days</option>
@@ -35,7 +39,9 @@ export function TimelineFilters({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-2">Event Type</label>
+          <label className="block text-sm font-medium text-stone-700 mb-2">
+            Event Type
+          </label>
           <select
             value={eventTypeFilter}
             onChange={(e) => onEventTypeFilterChange(e.target.value)}
@@ -50,7 +56,9 @@ export function TimelineFilters({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-stone-700 mb-2">Status</label>
+          <label className="block text-sm font-medium text-stone-700 mb-2">
+            Status
+          </label>
           <select
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value)}

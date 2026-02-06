@@ -1,9 +1,9 @@
-import { DropResult } from '@hello-pangea/dnd';
-import type { Item, ItemStatus } from '@/types';
+import { DropResult } from "@hello-pangea/dnd";
+import type { Item, ItemStatus } from "@/types";
 
 interface UseDragDropHandlersProps {
   items: Item[];
-  updateItem: (id: string, updates: Partial<Item>) => Promise<void>;
+  updateItem: (id: string, updates: Partial<Item>) => Promise<boolean>;
   openFeedbackModal: (item: Item, metaSkillName: string) => void;
   metaSkills: any[];
 }
@@ -12,7 +12,7 @@ export function useDragDropHandlers({
   items,
   updateItem,
   openFeedbackModal,
-  metaSkills
+  metaSkills,
 }: UseDragDropHandlersProps) {
   const handleDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -29,9 +29,9 @@ export function useDragDropHandlers({
     const item = items.find((i) => i.id === draggableId);
 
     if (
-      newStatus === 'done' &&
+      newStatus === "done" &&
       item?.solvedWithMetaSkill &&
-      source.droppableId !== 'done'
+      source.droppableId !== "done"
     ) {
       const metaSkill = metaSkills.find(
         (ms) => ms.id === item.solvedWithMetaSkill,
