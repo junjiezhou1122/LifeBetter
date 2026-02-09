@@ -15,6 +15,15 @@ import type { Item, ItemStatus } from "@/types";
 
 export function UnifiedBoard() {
   const {
+    navigationStack,
+    currentParentId,
+    isRootLevel,
+    drillDown,
+    navigateToBreadcrumb,
+    goBack,
+  } = useNavigation();
+
+  const {
     items,
     allItems,
     loading,
@@ -23,15 +32,7 @@ export function UnifiedBoard() {
     deleteItem,
     updateItem,
     refreshItems,
-  } = useItems(null);
-
-  const {
-    navigationStack,
-    isRootLevel,
-    drillDown,
-    navigateToBreadcrumb,
-    goBack,
-  } = useNavigation();
+  } = useItems(currentParentId);
 
   const { metaSkills, updateMetaSkill } = useMetaSkills();
 
@@ -60,6 +61,7 @@ export function UnifiedBoard() {
   });
 
   const columns = isRootLevel ? ROOT_COLUMNS : NESTED_COLUMNS;
+  const rightPanelOpen = breakdownSidebar.isOpen || detailSidebar.isOpen;
 
   const handleItemClick = (item: Item) => {
     openDetailSidebar(item);
@@ -147,6 +149,7 @@ export function UnifiedBoard() {
         navigationStack={navigationStack}
         isRootLevel={isRootLevel}
         leftSidebarOpen={leftSidebarOpen}
+        rightPanelOpen={rightPanelOpen}
         items={items}
         columns={columns}
         getChildCount={getChildCount}

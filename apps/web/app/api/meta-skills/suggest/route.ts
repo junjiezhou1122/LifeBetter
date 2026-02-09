@@ -5,6 +5,7 @@ import path from 'path';
 type MetaSkillWorkflow =
   | { type: 'ai-breakdown'; aiPrompt?: string }
   | { type: 'template'; template?: Array<{ title: string; description?: string; estimatedHours?: number }> }
+  | { type: 'ai-auto-solve'; aiPrompt?: string }
   | { type: string; [key: string]: unknown };
 
 interface MetaSkill {

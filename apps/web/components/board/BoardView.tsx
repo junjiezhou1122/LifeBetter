@@ -14,6 +14,7 @@ interface BoardViewProps {
   navigationStack: NavigationItem[];
   isRootLevel: boolean;
   leftSidebarOpen: boolean;
+  rightPanelOpen: boolean;
   items: Item[];
   columns: Column[];
   getChildCount: (itemId: string) => number;
@@ -34,6 +35,7 @@ export function BoardView({
   navigationStack,
   isRootLevel,
   leftSidebarOpen,
+  rightPanelOpen,
   items,
   columns,
   getChildCount,
@@ -52,7 +54,7 @@ export function BoardView({
     <div
       className={`relative flex-1 transition-all duration-300 ${
         leftSidebarOpen ? "ml-[19rem]" : "ml-0"
-      }`}
+      } ${rightPanelOpen ? "lg:mr-[clamp(20rem,38vw,26rem)]" : "mr-0"}`}
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(214,171,108,0.22),transparent_45%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(255,251,243,0.9),transparent)]" />

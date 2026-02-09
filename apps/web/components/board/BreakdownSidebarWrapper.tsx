@@ -19,7 +19,7 @@ export function BreakdownSidebarWrapper({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-0 right-0 top-0 z-50 flex w-[26rem] max-w-[92vw] flex-col border-l border-[#d7c2a3] bg-[linear-gradient(180deg,#fffefb,#fff7ea)] shadow-[0_14px_32px_rgba(96,66,29,0.16)]">
+    <div className="fixed bottom-0 right-0 top-0 z-50 flex w-[clamp(20rem,38vw,26rem)] max-w-[92vw] flex-col border-l border-[#d7c2a3] bg-[linear-gradient(180deg,#fffefb,#fff7ea)] shadow-[0_14px_32px_rgba(96,66,29,0.16)]">
       <div className="flex items-center justify-between border-b border-[#dec9a8] bg-[linear-gradient(120deg,#fff7ea,#f8e9d0)] px-4 py-3">
         <div className="flex items-center gap-2">
           <Sparkles className="h-[18px] w-[18px] text-[#b35a2f]" />

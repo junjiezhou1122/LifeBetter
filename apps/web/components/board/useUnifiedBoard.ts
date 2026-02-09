@@ -36,14 +36,18 @@ export function useUnifiedBoard() {
   }, [leftSidebarOpen]);
 
   const openBreakdownSidebar = (id: string, title: string) => {
+    // Keep right-side panels mutually exclusive.
+    setDetailSidebar({ isOpen: false, item: null });
     setBreakdownSidebar({ isOpen: true, id, title });
   };
 
   const closeBreakdownSidebar = () => {
-    setBreakdownSidebar({ ...breakdownSidebar, isOpen: false });
+    setBreakdownSidebar((prev) => ({ ...prev, isOpen: false }));
   };
 
   const openDetailSidebar = (item: Item) => {
+    // Keep right-side panels mutually exclusive.
+    setBreakdownSidebar((prev) => ({ ...prev, isOpen: false }));
     setDetailSidebar({ isOpen: true, item });
   };
 
@@ -60,16 +64,17 @@ export function useUnifiedBoard() {
   };
 
   const updateDetailSidebarItem = (updates: Partial<Item>) => {
-    if (detailSidebar.item) {
-      setDetailSidebar({
-        ...detailSidebar,
+    setDetailSidebar((prev) => {
+      if (!prev.item) return prev;
+      return {
+        ...prev,
         item: {
-          ...detailSidebar.item,
+          ...prev.item,
           ...updates,
           updatedAt: new Date().toISOString(),
         } as Item,
-      });
-    }
+      };
+    });
   };
 
   return {

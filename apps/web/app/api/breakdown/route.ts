@@ -98,7 +98,11 @@ export async function POST(request: Request) {
 
     // If meta-skill provided and has workflow, use it
     if (metaSkill && metaSkill.workflow) {
-      if (metaSkill.workflow.type === 'ai-breakdown' && metaSkill.workflow.aiPrompt) {
+      if (
+        (metaSkill.workflow.type === 'ai-breakdown' ||
+          metaSkill.workflow.type === 'ai-auto-solve') &&
+        metaSkill.workflow.aiPrompt
+      ) {
         // Use custom meta-skill prompt
         prompt = `${metaSkill.workflow.aiPrompt}
 

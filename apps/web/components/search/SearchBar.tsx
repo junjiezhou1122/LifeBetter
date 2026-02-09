@@ -92,9 +92,9 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-2xl">
+    <div ref={searchRef} className="relative w-full max-w-xl">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b7c65]" />
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8b7c65]" />
         <input
           type="text"
           value={query}
@@ -103,23 +103,23 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
             if (results.length > 0) setShowResults(true);
           }}
           placeholder="Search items..."
-          className="lb-input w-full rounded-xl py-2.5 pl-9 pr-20 text-sm shadow-[0_6px_18px_rgba(101,77,42,0.1)]"
+          className="lb-input w-full rounded-xl py-2 pl-8 pr-[4.5rem] text-[13px] shadow-[0_5px_14px_rgba(101,77,42,0.1)]"
         />
 
-        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
-          {loading && <Loader2 className="h-4 w-4 animate-spin text-[#8b7c65]" />}
+        <div className="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center gap-0.5">
+          {loading && <Loader2 className="h-3.5 w-3.5 animate-spin text-[#8b7c65]" />}
 
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              'rounded-lg p-1.5 transition-colors',
+              'rounded-md p-1.5 transition-colors',
               showFilters || filters.status !== 'all' || filters.priority !== 'all' || filters.depth !== 'all'
                 ? 'bg-[#f4dab4] text-[#7b4b22]'
                 : 'text-[#8b7c65] hover:text-[#6f624f] hover:bg-[#f6ead6]'
             )}
             title="Filters"
           >
-            <Filter className="w-4 h-4" />
+            <Filter className="h-3.5 w-3.5" />
           </button>
 
           {query && (
@@ -129,9 +129,9 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
                 setResults([]);
                 setShowResults(false);
               }}
-              className="rounded-lg p-1.5 text-[#8b7c65] transition-colors hover:bg-[#f6ead6] hover:text-[#6f624f]"
+              className="rounded-md p-1.5 text-[#8b7c65] transition-colors hover:bg-[#f6ead6] hover:text-[#6f624f]"
             >
-              <X className="w-4 h-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           )}
         </div>

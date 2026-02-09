@@ -81,7 +81,7 @@ export function ItemDetailSidebar({ item, onClose, onUpdate }: ItemDetailSidebar
   };
 
   return (
-    <div className="fixed bottom-0 right-0 top-0 z-50 flex w-[26rem] max-w-[92vw] flex-col border-l border-[#d7c2a3] bg-[linear-gradient(180deg,#fffefb,#fff7ea)] shadow-[0_14px_32px_rgba(96,66,29,0.16)]">
+    <div className="fixed bottom-0 right-0 top-0 z-50 flex w-[clamp(20rem,38vw,26rem)] max-w-[92vw] flex-col border-l border-[#d7c2a3] bg-[linear-gradient(180deg,#fffefb,#fff7ea)] shadow-[0_14px_32px_rgba(96,66,29,0.16)]">
       <ItemSidebarHeader
         isEditing={isEditing}
         onClose={onClose}
