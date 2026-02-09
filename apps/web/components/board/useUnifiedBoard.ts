@@ -1,17 +1,15 @@
 import { useState, useEffect } from 'react';
 import type { Item } from '@/types';
+import type { TabType } from '../sidebar/item-detail/ItemSidebarTabs';
+import type { AITabMode } from '../sidebar/breakdown/BreakdownSidebarContent';
 
 export function useUnifiedBoard() {
-  const [breakdownSidebar, setBreakdownSidebar] = useState<{
-    isOpen: boolean;
-    id: string;
-    title: string;
-  }>({ isOpen: false, id: '', title: '' });
-
   const [detailSidebar, setDetailSidebar] = useState<{
     isOpen: boolean;
     item: Item | null;
-  }>({ isOpen: false, item: null });
+    activeTab: TabType;
+    aiMode: AITabMode;
+  }>({ isOpen: false, item: null, activeTab: 'details', aiMode: 'breakdown' });
 
   const [feedbackModal, setFeedbackModal] = useState<{
     isOpen: boolean;
@@ -35,24 +33,21 @@ export function useUnifiedBoard() {
     }
   }, [leftSidebarOpen]);
 
-  const openBreakdownSidebar = (id: string, title: string) => {
-    // Keep right-side panels mutually exclusive.
-    setDetailSidebar({ isOpen: false, item: null });
-    setBreakdownSidebar({ isOpen: true, id, title });
-  };
-
-  const closeBreakdownSidebar = () => {
-    setBreakdownSidebar((prev) => ({ ...prev, isOpen: false }));
-  };
-
-  const openDetailSidebar = (item: Item) => {
-    // Keep right-side panels mutually exclusive.
-    setBreakdownSidebar((prev) => ({ ...prev, isOpen: false }));
-    setDetailSidebar({ isOpen: true, item });
+  const openDetailSidebar = (
+    item: Item,
+    tab: TabType = 'details',
+    aiMode: AITabMode = 'breakdown',
+  ) => {
+    setDetailSidebar({ isOpen: true, item, activeTab: tab, aiMode });
   };
 
   const closeDetailSidebar = () => {
-    setDetailSidebar({ isOpen: false, item: null });
+    setDetailSidebar({
+      isOpen: false,
+      item: null,
+      activeTab: 'details',
+      aiMode: 'breakdown',
+    });
   };
 
   const openFeedbackModal = (item: Item, metaSkillName: string) => {
@@ -78,15 +73,12 @@ export function useUnifiedBoard() {
   };
 
   return {
-    breakdownSidebar,
     detailSidebar,
     feedbackModal,
     leftSidebarOpen,
     currentView,
     setLeftSidebarOpen,
     setCurrentView,
-    openBreakdownSidebar,
-    closeBreakdownSidebar,
     openDetailSidebar,
     closeDetailSidebar,
     openFeedbackModal,

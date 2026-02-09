@@ -24,7 +24,8 @@ interface BoardViewProps {
   onSearchResultClick: (itemId: string) => void;
   onItemClick: (item: Item) => void;
   onDrillDown: (item: Item) => void;
-  onBreakdown: (itemId: string, title: string) => void;
+  onBreakdown: (item: Item) => void;
+  onAutoSolve: (item: Item) => void;
   onDelete: (itemId: string) => void;
   onAddItem: (title: string, description: string, priority: string, status?: ItemStatus) => Promise<void>;
   onDragEnd: (result: DropResult) => void;
@@ -46,6 +47,7 @@ export function BoardView({
   onItemClick,
   onDrillDown,
   onBreakdown,
+  onAutoSolve,
   onDelete,
   onAddItem,
   onDragEnd
@@ -54,7 +56,7 @@ export function BoardView({
     <div
       className={`relative flex-1 transition-all duration-300 ${
         leftSidebarOpen ? "ml-[19rem]" : "ml-0"
-      } ${rightPanelOpen ? "lg:mr-[clamp(20rem,38vw,26rem)]" : "mr-0"}`}
+      } ${rightPanelOpen ? "md:mr-[clamp(20rem,38vw,26rem)]" : "mr-0"}`}
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(214,171,108,0.22),transparent_45%)]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(255,251,243,0.9),transparent)]" />
@@ -68,7 +70,7 @@ export function BoardView({
       {currentView === "reflection" && <ReflectionInline />}
 
       {currentView === "board" && (
-        <div className="relative h-full overflow-y-auto px-3 pb-4 pt-3 md:px-4 md:pb-5 md:pt-3.5">
+        <div className="relative flex h-full min-h-0 flex-col overflow-hidden px-3 pb-4 pt-3 md:px-4 md:pb-5 md:pt-3.5">
           <BoardHeader
             navigationStack={navigationStack}
             isRootLevel={isRootLevel}
@@ -79,7 +81,7 @@ export function BoardView({
             onSearchResultClick={onSearchResultClick}
           />
 
-          <div className="rounded-2xl border border-[#dbc9ad] bg-[linear-gradient(160deg,rgba(255,252,247,0.9),rgba(251,240,219,0.86))] p-2 shadow-[0_10px_28px_rgba(114,78,25,0.14)] md:p-2.5">
+          <div className="min-h-0 flex-1 rounded-2xl border border-[#dbc9ad] bg-[linear-gradient(160deg,rgba(255,252,247,0.9),rgba(251,240,219,0.86))] p-2 shadow-[0_10px_28px_rgba(114,78,25,0.14)] md:p-2.5">
             <KanbanBoard
               items={items}
               columns={columns}
@@ -87,6 +89,7 @@ export function BoardView({
               onItemClick={onItemClick}
               onDrillDown={onDrillDown}
               onBreakdown={onBreakdown}
+              onAutoSolve={onAutoSolve}
               onDelete={onDelete}
               onAddItem={onAddItem}
               onDragEnd={onDragEnd}

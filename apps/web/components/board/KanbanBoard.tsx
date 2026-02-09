@@ -16,7 +16,8 @@ interface KanbanBoardProps {
   getChildCount: (itemId: string) => number;
   onItemClick: (item: Item) => void;
   onDrillDown: (item: Item) => void;
-  onBreakdown: (itemId: string, title: string) => void;
+  onBreakdown: (item: Item) => void;
+  onAutoSolve: (item: Item) => void;
   onDelete: (itemId: string) => void;
   onAddItem: (
     title: string,
@@ -34,6 +35,7 @@ export function KanbanBoard({
   onItemClick,
   onDrillDown,
   onBreakdown,
+  onAutoSolve,
   onDelete,
   onAddItem,
   onDragEnd,
@@ -57,9 +59,9 @@ export function KanbanBoard({
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="lb-scrollbar overflow-x-auto pb-1.5">
+      <div className="lb-scrollbar h-full overflow-x-auto overflow-y-hidden pb-1.5">
         <div
-          className="grid min-w-[860px] gap-2.5 md:gap-3"
+          className="grid h-full min-w-[860px] gap-2.5 md:gap-3"
           style={{
             gridTemplateColumns: `repeat(${columns.length}, minmax(210px, 1fr))`,
           }}
@@ -70,7 +72,7 @@ export function KanbanBoard({
             return (
               <div
                 key={column.id}
-                className="lb-rise-in flex min-h-[calc(100vh-245px)] flex-col overflow-hidden rounded-xl border border-[#d7c2a3] bg-white/80 shadow-[0_6px_18px_rgba(93,65,29,0.12)]"
+                className="lb-rise-in flex h-full min-h-[480px] flex-col overflow-hidden rounded-xl border border-[#d7c2a3] bg-white/80 shadow-[0_6px_18px_rgba(93,65,29,0.12)]"
                 style={{ animationDelay: `${columnIndex * 45}ms` }}
               >
                 <div
@@ -156,8 +158,9 @@ export function KanbanBoard({
                                 onClick={() => onItemClick(item)}
                                 onDrillDown={() => onDrillDown(item)}
                                 onBreakdown={() =>
-                                  onBreakdown(item.id, item.title)
+                                  onBreakdown(item)
                                 }
+                                onAutoSolve={() => onAutoSolve(item)}
                                 onDelete={() => onDelete(item.id)}
                               />
                             </div>

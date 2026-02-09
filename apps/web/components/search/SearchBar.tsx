@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, X, Filter, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SearchFilters } from './SearchFilters';
@@ -19,9 +19,10 @@ interface SearchResult {
 
 interface SearchBarProps {
   onResultClick?: (itemId: string) => void;
+  className?: string;
 }
 
-export function SearchBar({ onResultClick }: SearchBarProps) {
+export function SearchBar({ onResultClick, className = '' }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,20 +48,7 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-      if (query.trim() || filters.status !== 'all' || filters.priority !== 'all' || filters.depth !== 'all') {
-        performSearch();
-      } else {
-        setResults([]);
-        setShowResults(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(delayDebounce);
-  }, [query, filters]);
-
-  const performSearch = async () => {
+  const performSearch = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -79,7 +67,25 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [query, filters]);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (
+        query.trim() ||
+        filters.status !== 'all' ||
+        filters.priority !== 'all' ||
+        filters.depth !== 'all'
+      ) {
+        performSearch();
+      } else {
+        setResults([]);
+        setShowResults(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query, filters, performSearch]);
 
   const handleResultClick = (itemId: string) => {
     onResultClick?.(itemId);
@@ -92,7 +98,7 @@ export function SearchBar({ onResultClick }: SearchBarProps) {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-xl">
+    <div ref={searchRef} className={`relative w-full max-w-xl ${className}`}>
       <div className="relative">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8b7c65]" />
         <input

@@ -3,7 +3,6 @@
 import { LeftSidebar } from "../sidebar/LeftSidebar";
 import { ItemDetailSidebar } from "../sidebar/item-detail/ItemDetailSidebar";
 import { MetaSkillFeedbackModal } from "../modals/MetaSkillFeedbackModal";
-import { BreakdownSidebarWrapper } from "./BreakdownSidebarWrapper";
 import { BoardView } from "./BoardView";
 import { useItems } from "@/hooks/useItems";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -37,15 +36,12 @@ export function UnifiedBoard() {
   const { metaSkills, updateMetaSkill } = useMetaSkills();
 
   const {
-    breakdownSidebar,
     detailSidebar,
     feedbackModal,
     leftSidebarOpen,
     currentView,
     setLeftSidebarOpen,
     setCurrentView,
-    openBreakdownSidebar,
-    closeBreakdownSidebar,
     openDetailSidebar,
     closeDetailSidebar,
     openFeedbackModal,
@@ -61,10 +57,18 @@ export function UnifiedBoard() {
   });
 
   const columns = isRootLevel ? ROOT_COLUMNS : NESTED_COLUMNS;
-  const rightPanelOpen = breakdownSidebar.isOpen || detailSidebar.isOpen;
+  const rightPanelOpen = detailSidebar.isOpen;
 
   const handleItemClick = (item: Item) => {
     openDetailSidebar(item);
+  };
+
+  const handleBreakdownClick = (item: Item) => {
+    openDetailSidebar(item, "ai", "breakdown");
+  };
+
+  const handleAutoSolveClick = (item: Item) => {
+    openDetailSidebar(item, "ai", "auto-solve");
   };
 
   const handleDrillDown = (item: Item) => {
@@ -122,11 +126,6 @@ export function UnifiedBoard() {
     setLeftSidebarOpen(!leftSidebarOpen);
   };
 
-  const handleBreakdownConfirm = async () => {
-    await refreshItems();
-    closeBreakdownSidebar();
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -159,25 +158,21 @@ export function UnifiedBoard() {
         onSearchResultClick={handlePlanAgentItemClick}
         onItemClick={handleItemClick}
         onDrillDown={handleDrillDown}
-        onBreakdown={openBreakdownSidebar}
+        onBreakdown={handleBreakdownClick}
+        onAutoSolve={handleAutoSolveClick}
         onDelete={handleDeleteItem}
         onAddItem={handleAddItem}
         onDragEnd={handleDragEnd}
       />
 
-      <BreakdownSidebarWrapper
-        isOpen={breakdownSidebar.isOpen}
-        id={breakdownSidebar.id}
-        title={breakdownSidebar.title}
-        onClose={closeBreakdownSidebar}
-        onConfirm={handleBreakdownConfirm}
-      />
-
       {detailSidebar.isOpen && detailSidebar.item && (
         <ItemDetailSidebar
-          key={detailSidebar.item.id}
+          key={`${detailSidebar.item.id}-${detailSidebar.activeTab}-${detailSidebar.aiMode}`}
           item={detailSidebar.item}
+          initialTab={detailSidebar.activeTab}
+          initialAiMode={detailSidebar.aiMode}
           onClose={closeDetailSidebar}
+          onRefresh={refreshItems}
           onUpdate={(updates) =>
             handleUpdateItem(detailSidebar.item!.id, updates)
           }

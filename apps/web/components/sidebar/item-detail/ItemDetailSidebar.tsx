@@ -2,21 +2,35 @@
 
 import { useState, useEffect } from 'react';
 import { ItemSidebarHeader } from './ItemSidebarHeader';
-import { ItemSidebarTabs } from './ItemSidebarTabs';
+import { ItemSidebarTabs, type TabType } from './ItemSidebarTabs';
 import { ItemDetailsContent } from './ItemDetailsContent';
 import { ItemNotesContent } from './ItemNotesContent';
 import { ItemSidebarFooter } from './ItemSidebarFooter';
+import {
+  BreakdownSidebarContent,
+  type AITabMode,
+} from '../breakdown/BreakdownSidebarContent';
 import type { Item, MetaSkill } from '@/types';
 
 interface ItemDetailSidebarProps {
   item: Item;
+  initialTab?: TabType;
+  initialAiMode?: AITabMode;
   onClose: () => void;
+  onRefresh?: () => Promise<void> | void;
   onUpdate: (updates: Partial<Item>) => void;
 }
 
-export function ItemDetailSidebar({ item, onClose, onUpdate }: ItemDetailSidebarProps) {
+export function ItemDetailSidebar({
+  item,
+  initialTab = 'details',
+  initialAiMode = 'breakdown',
+  onClose,
+  onRefresh,
+  onUpdate,
+}: ItemDetailSidebarProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'notes'>('details');
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [notesMode, setNotesMode] = useState<'edit' | 'preview'>('edit');
   const [newTag, setNewTag] = useState('');
   const [showMetaSkillPicker, setShowMetaSkillPicker] = useState(false);
@@ -110,7 +124,7 @@ export function ItemDetailSidebar({ item, onClose, onUpdate }: ItemDetailSidebar
             onRemoveMetaSkill={handleRemoveMetaSkill}
             onToggleMetaSkillPicker={() => setShowMetaSkillPicker(!showMetaSkillPicker)}
           />
-        ) : (
+        ) : activeTab === 'notes' ? (
           <ItemNotesContent
             item={item}
             editedItem={editedItem}
@@ -122,6 +136,16 @@ export function ItemDetailSidebar({ item, onClose, onUpdate }: ItemDetailSidebar
             }}
             onNotesModeChange={setNotesMode}
             onSave={handleSave}
+          />
+        ) : (
+          <BreakdownSidebarContent
+            itemId={item.id}
+            title={item.title}
+            initialMode={initialAiMode}
+            onConfirm={async () => {
+              await onRefresh?.();
+              onClose();
+            }}
           />
         )}
       </div>

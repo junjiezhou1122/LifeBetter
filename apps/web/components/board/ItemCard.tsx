@@ -1,6 +1,6 @@
 'use client';
 
-import { Sparkles, Trash2, ChevronRight, AlertCircle } from 'lucide-react';
+import { Trash2, ChevronRight, AlertCircle } from 'lucide-react';
 
 interface Item {
   id: string;
@@ -25,7 +25,6 @@ interface ItemCardProps {
   childCount: number;
   onClick: () => void;
   onDrillDown?: () => void;
-  onBreakdown: () => void;
   onDelete: () => void;
 }
 
@@ -36,7 +35,13 @@ const priorityDots: Record<string, string> = {
   low: 'bg-[#2f7b65]'
 };
 
-export function ItemCard({ item, childCount, onClick, onDrillDown, onBreakdown, onDelete }: ItemCardProps) {
+export function ItemCard({
+  item,
+  childCount,
+  onClick,
+  onDrillDown,
+  onDelete,
+}: ItemCardProps) {
   const hasChildren = childCount > 0;
   const isBlocked = (item.blockedBy?.length || 0) > 0;
   const isBlocking = (item.blocking?.length || 0) > 0;
@@ -61,11 +66,6 @@ export function ItemCard({ item, childCount, onClick, onDrillDown, onBreakdown, 
     if (confirm(`Delete "${item.title}"${hasChildren ? ` and all ${childCount} sub-items` : ''}?`)) {
       onDelete();
     }
-  };
-
-  const handleBreakdown = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onBreakdown();
   };
 
   return (
@@ -132,14 +132,6 @@ export function ItemCard({ item, childCount, onClick, onDrillDown, onBreakdown, 
         </div>
 
         <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-          <button
-            onClick={handleBreakdown}
-            className="rounded-md p-1 text-[#85745f] transition-colors hover:bg-[#f4e6d1] hover:text-[#5e4f3a]"
-            title="AI Breakdown"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-          </button>
-
           <button
             onClick={handleDelete}
             className="rounded-md p-1 text-[#85745f] transition-colors hover:bg-[#f8e5e2] hover:text-[#a63b31]"

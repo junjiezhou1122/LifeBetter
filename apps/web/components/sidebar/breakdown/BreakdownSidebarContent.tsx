@@ -7,19 +7,23 @@ import { BreakdownActions } from "./BreakdownActions";
 import { useBreakdownSidebar } from "./useBreakdownSidebar";
 import { AutoSolvePanel } from "./AutoSolvePanel";
 
+export type AITabMode = "breakdown" | "auto-solve";
+
 interface BreakdownSidebarContentProps {
   itemId: string;
   title: string;
   onConfirm: () => void;
+  initialMode?: AITabMode;
 }
 
 export function BreakdownSidebarContent({
   itemId,
   title,
   onConfirm,
+  initialMode = "breakdown",
 }: BreakdownSidebarContentProps) {
   const [activeTab, setActiveTab] = useState<"breakdown" | "auto-solve">(
-    "breakdown",
+    initialMode,
   );
 
   const {

@@ -24,9 +24,9 @@ export function BoardHeader({
   const current = navigationStack[navigationStack.length - 1];
 
   return (
-    <div className="mb-3.5 lb-rise-in">
+    <div className="mb-3 lb-rise-in">
       <div className="rounded-2xl border border-[#dbc9ad] bg-[linear-gradient(120deg,#fffaf0,#f5ebd7)] px-2.5 py-2 shadow-[0_8px_22px_rgba(110,80,34,0.11)] md:px-3.5 md:py-2.5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
           <div className="flex min-w-0 items-center gap-1.5">
             {!leftSidebarOpen && (
               <button
@@ -65,25 +65,27 @@ export function BoardHeader({
           </div>
         </div>
 
-        <div className="mt-1.5 flex flex-wrap items-center gap-1">
-          {navigationStack.map((nav, index) => (
-            <button
-              key={`${nav.title}-${index}`}
-              onClick={() => onBreadcrumbClick(index)}
-              className={`rounded-full px-2 py-0.75 text-[10px] font-semibold transition ${
-                index === navigationStack.length - 1
-                  ? "bg-[#d26a3b] text-white shadow-[0_5px_12px_rgba(210,106,59,0.32)]"
-                  : "lb-chip hover:-translate-y-0.5 hover:bg-white"
-              }`}
-            >
-              {index + 1}. {nav.title}
-            </button>
-          ))}
+        <div className="mt-1.5 flex flex-col gap-1.5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 flex-wrap items-center gap-1">
+            {navigationStack.map((nav, index) => (
+              <button
+                key={`${nav.title}-${index}`}
+                onClick={() => onBreadcrumbClick(index)}
+                className={`rounded-full px-2 py-0.75 text-[10px] font-semibold transition ${
+                  index === navigationStack.length - 1
+                    ? "bg-[#d26a3b] text-white shadow-[0_5px_12px_rgba(210,106,59,0.32)]"
+                    : "lb-chip hover:-translate-y-0.5 hover:bg-white"
+                }`}
+              >
+                {index + 1}. {nav.title}
+              </button>
+            ))}
+          </div>
+          <SearchBar
+            onResultClick={onSearchResultClick}
+            className="max-w-none lg:max-w-[420px]"
+          />
         </div>
-      </div>
-
-      <div className="mt-2">
-        <SearchBar onResultClick={onSearchResultClick} />
       </div>
     </div>
   );
