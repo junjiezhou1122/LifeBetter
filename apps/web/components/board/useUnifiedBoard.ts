@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react';
 import type { Item } from '@/types';
 import type { TabType } from '../sidebar/item-detail/ItemSidebarTabs';
-import type { AITabMode } from '../sidebar/breakdown/BreakdownSidebarContent';
 
 export function useUnifiedBoard() {
   const [detailSidebar, setDetailSidebar] = useState<{
     isOpen: boolean;
     item: Item | null;
     activeTab: TabType;
-    aiMode: AITabMode;
-  }>({ isOpen: false, item: null, activeTab: 'details', aiMode: 'breakdown' });
+  }>({ isOpen: false, item: null, activeTab: 'details' });
 
   const [feedbackModal, setFeedbackModal] = useState<{
     isOpen: boolean;
@@ -33,12 +31,8 @@ export function useUnifiedBoard() {
     }
   }, [leftSidebarOpen]);
 
-  const openDetailSidebar = (
-    item: Item,
-    tab: TabType = 'details',
-    aiMode: AITabMode = 'breakdown',
-  ) => {
-    setDetailSidebar({ isOpen: true, item, activeTab: tab, aiMode });
+  const openDetailSidebar = (item: Item, tab: TabType = 'details') => {
+    setDetailSidebar({ isOpen: true, item, activeTab: tab });
   };
 
   const closeDetailSidebar = () => {
@@ -46,7 +40,6 @@ export function useUnifiedBoard() {
       isOpen: false,
       item: null,
       activeTab: 'details',
-      aiMode: 'breakdown',
     });
   };
 

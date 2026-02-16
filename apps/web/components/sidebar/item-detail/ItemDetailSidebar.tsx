@@ -6,16 +6,12 @@ import { ItemSidebarTabs, type TabType } from './ItemSidebarTabs';
 import { ItemDetailsContent } from './ItemDetailsContent';
 import { ItemNotesContent } from './ItemNotesContent';
 import { ItemSidebarFooter } from './ItemSidebarFooter';
-import {
-  BreakdownSidebarContent,
-  type AITabMode,
-} from '../breakdown/BreakdownSidebarContent';
+import { BreakdownSidebarContent } from '../breakdown/BreakdownSidebarContent';
 import type { Item, MetaSkill } from '@/types';
 
 interface ItemDetailSidebarProps {
   item: Item;
   initialTab?: TabType;
-  initialAiMode?: AITabMode;
   onClose: () => void;
   onRefresh?: () => Promise<void> | void;
   onUpdate: (updates: Partial<Item>) => void;
@@ -24,7 +20,6 @@ interface ItemDetailSidebarProps {
 export function ItemDetailSidebar({
   item,
   initialTab = 'details',
-  initialAiMode = 'breakdown',
   onClose,
   onRefresh,
   onUpdate,
@@ -126,7 +121,6 @@ export function ItemDetailSidebar({
           />
         ) : activeTab === 'notes' ? (
           <ItemNotesContent
-            item={item}
             editedItem={editedItem}
             notesMode={notesMode}
             isEditing={isEditing}
@@ -141,10 +135,15 @@ export function ItemDetailSidebar({
           <BreakdownSidebarContent
             itemId={item.id}
             title={item.title}
-            initialMode={initialAiMode}
+            itemNotes={editedItem.notes || item.notes || ''}
+            onNotesUpdate={(notes) =>
+              setEditedItem((prev) => ({
+                ...prev,
+                notes,
+              }))
+            }
             onConfirm={async () => {
               await onRefresh?.();
-              onClose();
             }}
           />
         )}

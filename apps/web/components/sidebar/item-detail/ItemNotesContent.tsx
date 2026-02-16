@@ -1,11 +1,11 @@
-import { FileText, Edit3, Eye, Save } from 'lucide-react';
+import { FileText, Edit3, Eye, Save, ListTree } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { renderMarkdown } from './MarkdownRenderer';
 import type { Item } from '@/types';
 
 type NotesMode = 'edit' | 'preview';
 
 interface ItemNotesContentProps {
-  item: Item;
   editedItem: Item;
   notesMode: NotesMode;
   isEditing: boolean;
@@ -15,7 +15,6 @@ interface ItemNotesContentProps {
 }
 
 export function ItemNotesContent({
-  item,
   editedItem,
   notesMode,
   isEditing,
@@ -23,6 +22,34 @@ export function ItemNotesContent({
   onNotesModeChange,
   onSave
 }: ItemNotesContentProps) {
+  const sessionBlocks = useMemo(() => {
+    const raw = editedItem.notes || '';
+    const parts = raw
+      .split('\n\n---\n\n')
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    return parts.map((content, index) => {
+      const headingLine = content
+        .split('\n')
+        .find((line) => line.startsWith('## AI Solve Session'));
+      const title = headingLine
+        ? headingLine.replace(/^##\s*/, '').trim()
+        : `Note ${index + 1}`;
+
+      return {
+        id: `${index}-${title}`,
+        title,
+        content,
+      };
+    });
+  }, [editedItem.notes]);
+
+  const [activeSessionId, setActiveSessionId] = useState<string>('');
+
+  const activeSession =
+    sessionBlocks.find((block) => block.id === activeSessionId) || sessionBlocks[sessionBlocks.length - 1];
+
   return (
     <div className="space-y-4 h-full flex flex-col">
       <div className="flex items-center justify-between">
@@ -87,10 +114,36 @@ export function ItemNotesContent({
             </div>
           </div>
         ) : (
-          <div className="h-full border border-stone-200 rounded-lg p-4 bg-stone-50 overflow-y-auto">
+          <div className="h-full border border-stone-200 rounded-lg bg-stone-50 overflow-hidden">
             {editedItem.notes ? (
-              <div className="prose prose-sm max-w-none">
-                {renderMarkdown(editedItem.notes)}
+              <div className="grid h-full min-h-0 grid-cols-[11rem_1fr]">
+                <div className="border-r border-stone-200 bg-stone-100/70 p-2">
+                  <div className="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+                    <ListTree className="h-3 w-3" />
+                    Note Entries
+                  </div>
+                  <div className="lb-scrollbar space-y-1 overflow-y-auto pr-1">
+                    {sessionBlocks.map((block) => (
+                      <button
+                        key={block.id}
+                        onClick={() => setActiveSessionId(block.id)}
+                        className={`w-full rounded-md px-2 py-1.5 text-left text-[11px] transition-colors ${
+                          block.id === activeSession?.id
+                            ? 'bg-white text-stone-900 shadow-sm'
+                            : 'text-stone-600 hover:bg-white/80'
+                        }`}
+                      >
+                        {block.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="lb-scrollbar overflow-y-auto p-4">
+                  <div className="prose prose-sm max-w-none">
+                    {renderMarkdown(activeSession?.content || editedItem.notes)}
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="flex items-center justify-center h-full text-stone-400 italic">

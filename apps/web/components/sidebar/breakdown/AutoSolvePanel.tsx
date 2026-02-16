@@ -1,14 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Bot, GitBranch, Loader2, Sparkles, Wand2 } from 'lucide-react';
-
-interface SuggestedTask {
-  title: string;
-  description?: string;
-  priority: string;
-  estimatedHours?: number;
-}
 
 interface AutoSolveAction {
   title: string;
@@ -19,6 +12,7 @@ interface AutoSolveAction {
   confidence?: number;
   nextStepType?: 'breakdown' | 'manual-first-principle';
   suggestedBreakdown?: string[];
+  humanAdvice?: string;
   lineage?: string[];
   iteration?: number;
 }
@@ -33,14 +27,22 @@ interface AutoSolveSummary {
 interface AutoSolvePanelProps {
   itemId: string;
   title: string;
-  suggestedTasks: SuggestedTask[];
+  existingNotes: string;
+  breakdownSeedTasks?: Array<{
+    title: string;
+    description?: string;
+    priority?: string;
+  }>;
+  onNotesApplied?: (notes: string) => void;
   onCompleted: () => void;
 }
 
 export function AutoSolvePanel({
   itemId,
   title,
-  suggestedTasks,
+  existingNotes,
+  breakdownSeedTasks = [],
+  onNotesApplied,
   onCompleted,
 }: AutoSolvePanelProps) {
   const [loading, setLoading] = useState(false);
@@ -49,6 +51,11 @@ export function AutoSolvePanel({
   const [actions, setActions] = useState<AutoSolveAction[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [summary, setSummary] = useState<AutoSolveSummary | null>(null);
+  const [notesBase, setNotesBase] = useState(existingNotes || '');
+
+  useEffect(() => {
+    setNotesBase(existingNotes || '');
+  }, [existingNotes, itemId]);
 
   const grouped = useMemo(
     () => ({
@@ -82,7 +89,7 @@ export function AutoSolvePanel({
       const res = await fetch('/api/auto-solve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId, title, breakdownTasks: suggestedTasks }),
+        body: JSON.stringify({ itemId, title, breakdownTasks: breakdownSeedTasks }),
       });
 
       if (!res.ok) throw new Error('Failed to analyze auto-solve');
@@ -95,10 +102,8 @@ export function AutoSolvePanel({
       setSummary(nextSummary);
 
       const defaults = new Set<number>();
-      nextActions.forEach((action, index) => {
-        if (action.canAutoSolve) {
-          defaults.add(index);
-        }
+      nextActions.forEach((_, index) => {
+        defaults.add(index);
       });
       setSelected(defaults);
     } catch (err) {
@@ -128,45 +133,87 @@ export function AutoSolvePanel({
     setExecuting(true);
     setError('');
     try {
-      for (const action of picked) {
-        const notes: string[] = [];
+      const now = new Date().toLocaleString();
+      const notesLines: string[] = [
+        `## AI Solve Session (${now})`,
+        `Focus: ${title}`,
+        '',
+      ];
+
+      picked.forEach((action, index) => {
+        const status = action.canAutoSolve
+          ? 'Solved by AI'
+          : action.nextStepType === 'breakdown'
+            ? 'Needs further breakdown'
+            : 'Human required';
+
+        notesLines.push(`### ${index + 1}. ${action.title}`);
+        notesLines.push(`Status: ${status}`);
+
+        if (action.description?.trim()) {
+          notesLines.push(`Context: ${action.description.trim()}`);
+        }
 
         if (action.autoSolveResult?.trim()) {
-          notes.push(`AI Auto-Solved Output:\n${action.autoSolveResult.trim()}`);
+          notesLines.push('');
+          notesLines.push('AI Output:');
+          notesLines.push(action.autoSolveResult.trim());
         }
 
         if (action.suggestedBreakdown && action.suggestedBreakdown.length > 0) {
-          notes.push(
-            `Recommended Next Breakdown:\n${action.suggestedBreakdown
-              .map((step, index) => `${index + 1}. ${step}`)
-              .join('\n')}`,
-          );
+          notesLines.push('');
+          notesLines.push('Suggested next breakdown:');
+          action.suggestedBreakdown.forEach((step, stepIndex) => {
+            notesLines.push(`${stepIndex + 1}. ${step}`);
+          });
+        }
+
+        if (action.humanAdvice?.trim()) {
+          notesLines.push('');
+          notesLines.push('Human advice:');
+          notesLines.push(action.humanAdvice.trim());
         }
 
         if (action.lineage && action.lineage.length > 1) {
-          notes.push(`Lineage: ${action.lineage.join(' -> ')}`);
+          notesLines.push(`Lineage: ${action.lineage.join(' -> ')}`);
         }
 
-        await fetch('/api/items', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            parentId: itemId,
-            title: action.title,
-            description: [action.description || '', ...notes].filter(Boolean).join('\n\n').trim(),
-            priority: action.priority || 'medium',
-            status: action.canAutoSolve ? 'done' : 'todo',
-          }),
-        });
+        if (typeof action.confidence === 'number') {
+          notesLines.push(`Confidence: ${Math.round(action.confidence * 100)}%`);
+        }
+
+        notesLines.push('');
+      });
+
+      const sessionBlock = notesLines.join('\n').trim();
+      const mergedNotes = [notesBase?.trim() || '', sessionBlock]
+        .filter(Boolean)
+        .join('\n\n---\n\n');
+
+      const response = await fetch('/api/items', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: itemId,
+          updates: {
+            notes: mergedNotes,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update item notes');
       }
 
+      setNotesBase(mergedNotes);
+      onNotesApplied?.(mergedNotes);
       onCompleted();
       setActions([]);
       setSummary(null);
       setSelected(new Set());
     } catch (err) {
       console.error(err);
-      setError('Failed while creating auto-solve items. Please try again.');
+      setError('Failed to apply selected results to notes. Please try again.');
     } finally {
       setExecuting(false);
     }
@@ -176,14 +223,14 @@ export function AutoSolvePanel({
     <div className="space-y-4">
       <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-3 shadow-[0_6px_18px_rgba(95,67,31,0.1)]">
         <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[#6c5d47]">
-          AI Auto Solve
+          Unified AI Decision
         </p>
         <p className="text-xs leading-relaxed text-[#6f6352]">
-          After breakdown, AI will recursively solve what it can. For tasks it cannot solve,
-          AI keeps suggesting deeper breakdown until first-principle manual steps.
+          AI recursively analyzes this item and classifies each step into 3 types:
+          Solved by AI, Needs further breakdown, or Human required.
         </p>
         <p className="mt-1 text-[11px] leading-relaxed text-[#8a7b67]">
-          You can run this directly. If no breakdown exists yet, AI starts from the current item.
+          Applying results writes a structured AI session directly into this item notes section.
         </p>
       </div>
 
@@ -207,7 +254,7 @@ export function AutoSolvePanel({
           ) : (
             <>
               <Sparkles className="h-4 w-4" />
-              Analyze + Recursive Auto Solve
+              Run AI Plan + Solve
             </>
           )}
         </button>
@@ -215,15 +262,15 @@ export function AutoSolvePanel({
         <>
           <div className="grid grid-cols-3 gap-1.5 rounded-lg border border-[#dbc9ad] bg-[#fff8ec] p-2">
             <div className="rounded-md bg-[#e4f3ec] px-2 py-1 text-center">
-              <p className="text-[10px] uppercase tracking-wide text-[#3a6d5c]">Auto</p>
+              <p className="text-[10px] uppercase tracking-wide text-[#3a6d5c]">Solved</p>
               <p className="text-sm font-semibold text-[#1f5b47]">{grouped.auto}</p>
             </div>
             <div className="rounded-md bg-[#f8ead5] px-2 py-1 text-center">
-              <p className="text-[10px] uppercase tracking-wide text-[#8a5529]">Breakdown</p>
+              <p className="text-[10px] uppercase tracking-wide text-[#8a5529]">Needs Breakdown</p>
               <p className="text-sm font-semibold text-[#7a4b23]">{grouped.needsBreakdown}</p>
             </div>
             <div className="rounded-md bg-[#f0ece4] px-2 py-1 text-center">
-              <p className="text-[10px] uppercase tracking-wide text-[#6d6252]">First Principle</p>
+              <p className="text-[10px] uppercase tracking-wide text-[#6d6252]">Human Required</p>
               <p className="text-sm font-semibold text-[#5c5144]">{grouped.firstPrinciple}</p>
             </div>
           </div>
@@ -255,7 +302,7 @@ export function AutoSolvePanel({
                       Round {group.iteration}
                     </p>
                     <p className="text-[10px] text-[#7b6e5d]">
-                      {roundAuto} auto · {roundBreakdown} breakdown · {roundManual} manual
+                      {roundAuto} solved · {roundBreakdown} needs breakdown · {roundManual} human
                     </p>
                   </div>
 
@@ -282,10 +329,10 @@ export function AutoSolvePanel({
                             }`}
                           >
                             {action.canAutoSolve
-                              ? 'Auto'
+                              ? 'Solved by AI'
                               : action.nextStepType === 'manual-first-principle'
-                                ? 'Manual'
-                                : 'Break down'}
+                                ? 'Human required'
+                                : 'Needs breakdown'}
                           </span>
                         </div>
 
@@ -310,6 +357,17 @@ export function AutoSolvePanel({
                                 </p>
                               ))}
                             </div>
+                          </div>
+                        )}
+
+                        {action.humanAdvice && (
+                          <div className="mt-2 rounded-md border border-[#ddd4c6] bg-[#f7f2e8] px-2 py-1.5">
+                            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-[#6f6250]">
+                              Human Advice
+                            </p>
+                            <p className="text-[11px] leading-relaxed text-[#6f6352]">
+                              {action.humanAdvice}
+                            </p>
                           </div>
                         )}
 
@@ -345,12 +403,12 @@ export function AutoSolvePanel({
             {executing ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Creating items...
+                Applying to notes...
               </>
             ) : (
               <>
                 <Bot className="h-4 w-4" />
-                Create {selected.size} Selected Item{selected.size > 1 ? 's' : ''}
+                Write {selected.size} AI Decision{selected.size > 1 ? 's' : ''} to Notes
               </>
             )}
           </button>

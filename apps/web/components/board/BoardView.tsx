@@ -24,8 +24,6 @@ interface BoardViewProps {
   onSearchResultClick: (itemId: string) => void;
   onItemClick: (item: Item) => void;
   onDrillDown: (item: Item) => void;
-  onBreakdown: (item: Item) => void;
-  onAutoSolve: (item: Item) => void;
   onDelete: (itemId: string) => void;
   onAddItem: (title: string, description: string, priority: string, status?: ItemStatus) => Promise<void>;
   onDragEnd: (result: DropResult) => void;
@@ -46,8 +44,6 @@ export function BoardView({
   onSearchResultClick,
   onItemClick,
   onDrillDown,
-  onBreakdown,
-  onAutoSolve,
   onDelete,
   onAddItem,
   onDragEnd
@@ -88,8 +84,6 @@ export function BoardView({
               getChildCount={getChildCount}
               onItemClick={onItemClick}
               onDrillDown={onDrillDown}
-              onBreakdown={onBreakdown}
-              onAutoSolve={onAutoSolve}
               onDelete={onDelete}
               onAddItem={onAddItem}
               onDragEnd={onDragEnd}

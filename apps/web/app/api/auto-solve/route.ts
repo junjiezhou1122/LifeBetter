@@ -19,6 +19,7 @@ interface AutoSolveAction {
   confidence?: number;
   nextStepType?: 'breakdown' | 'manual-first-principle';
   suggestedBreakdown?: string[];
+  humanAdvice?: string;
   lineage?: string[];
   iteration?: number;
 }
@@ -32,6 +33,7 @@ interface AnalyzeResult {
   confidence?: number;
   reason?: string;
   atFirstPrinciple?: boolean;
+  humanAdvice?: string;
 }
 
 interface BreakdownResult {
@@ -116,6 +118,8 @@ function normalizeAnalyzeResults(raw: unknown): AnalyzeResult[] {
           : undefined,
       reason: typeof maybe.reason === 'string' ? maybe.reason.trim() : '',
       atFirstPrinciple: Boolean(maybe.atFirstPrinciple),
+      humanAdvice:
+        typeof maybe.humanAdvice === 'string' ? maybe.humanAdvice.trim() : '',
     });
 
     return acc;
@@ -193,7 +197,8 @@ Return JSON array only with the same number of tasks:
     "autoSolveResult": "Concrete output AI can directly provide now",
     "confidence": 0.85,
     "reason": "Why it can/cannot be solved now",
-    "atFirstPrinciple": false
+    "atFirstPrinciple": false,
+    "humanAdvice": "What a human should do next if AI cannot complete it"
   }
 ]
 
@@ -201,6 +206,7 @@ Rules:
 - canAutoSolve=true only if AI can complete the deliverable fully in text.
 - canAutoSolve=false for tasks needing physical execution, decisions, measurements, or external validation.
 - atFirstPrinciple=true when task is atomic/manual and should not be broken down further.
+- When canAutoSolve=false, always provide humanAdvice with concrete next actions.
 - confidence must be between 0 and 1.`;
 
   const response = await client.chat.completions.create({
@@ -292,6 +298,11 @@ function toAction(
         ? 'manual-first-principle'
         : 'breakdown',
     suggestedBreakdown: breakdown,
+    humanAdvice:
+      result.humanAdvice ||
+      (result.atFirstPrinciple
+        ? 'Handle this step manually and document outcome in Notes.'
+        : 'Break this step down further, then retry AI solve on the smaller steps.'),
     lineage: source.lineage,
     iteration: iteration + 1,
   };

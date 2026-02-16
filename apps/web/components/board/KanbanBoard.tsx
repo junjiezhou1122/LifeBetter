@@ -16,8 +16,6 @@ interface KanbanBoardProps {
   getChildCount: (itemId: string) => number;
   onItemClick: (item: Item) => void;
   onDrillDown: (item: Item) => void;
-  onBreakdown: (item: Item) => void;
-  onAutoSolve: (item: Item) => void;
   onDelete: (itemId: string) => void;
   onAddItem: (
     title: string,
@@ -34,8 +32,6 @@ export function KanbanBoard({
   getChildCount,
   onItemClick,
   onDrillDown,
-  onBreakdown,
-  onAutoSolve,
   onDelete,
   onAddItem,
   onDragEnd,
@@ -157,10 +153,6 @@ export function KanbanBoard({
                                 childCount={getChildCount(item.id)}
                                 onClick={() => onItemClick(item)}
                                 onDrillDown={() => onDrillDown(item)}
-                                onBreakdown={() =>
-                                  onBreakdown(item)
-                                }
-                                onAutoSolve={() => onAutoSolve(item)}
                                 onDelete={() => onDelete(item.id)}
                               />
                             </div>

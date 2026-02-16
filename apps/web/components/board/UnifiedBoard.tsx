@@ -63,14 +63,6 @@ export function UnifiedBoard() {
     openDetailSidebar(item);
   };
 
-  const handleBreakdownClick = (item: Item) => {
-    openDetailSidebar(item, "ai", "breakdown");
-  };
-
-  const handleAutoSolveClick = (item: Item) => {
-    openDetailSidebar(item, "ai", "auto-solve");
-  };
-
   const handleDrillDown = (item: Item) => {
     drillDown(item.id, item.title, item.depth);
   };
@@ -158,8 +150,6 @@ export function UnifiedBoard() {
         onSearchResultClick={handlePlanAgentItemClick}
         onItemClick={handleItemClick}
         onDrillDown={handleDrillDown}
-        onBreakdown={handleBreakdownClick}
-        onAutoSolve={handleAutoSolveClick}
         onDelete={handleDeleteItem}
         onAddItem={handleAddItem}
         onDragEnd={handleDragEnd}
@@ -167,10 +157,9 @@ export function UnifiedBoard() {
 
       {detailSidebar.isOpen && detailSidebar.item && (
         <ItemDetailSidebar
-          key={`${detailSidebar.item.id}-${detailSidebar.activeTab}-${detailSidebar.aiMode}`}
+          key={`${detailSidebar.item.id}-${detailSidebar.activeTab}`}
           item={detailSidebar.item}
           initialTab={detailSidebar.activeTab}
-          initialAiMode={detailSidebar.aiMode}
           onClose={closeDetailSidebar}
           onRefresh={refreshItems}
           onUpdate={(updates) =>
