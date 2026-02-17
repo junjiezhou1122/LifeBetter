@@ -8,6 +8,7 @@ import { ItemNotesContent } from './ItemNotesContent';
 import { ItemExperienceContent } from './ItemExperienceContent';
 import { ItemSidebarFooter } from './ItemSidebarFooter';
 import { BreakdownSidebarContent } from '../breakdown/BreakdownSidebarContent';
+import { AgentPanel } from '../../agent/AgentPanel';
 import type { Item, MetaSkill } from '@/types';
 
 interface ItemDetailSidebarProps {
@@ -136,20 +137,26 @@ export function ItemDetailSidebar({
         ) : activeTab === 'experience' ? (
           <ItemExperienceContent item={item} />
         ) : (
-          <BreakdownSidebarContent
-            itemId={item.id}
-            title={item.title}
-            itemNotes={editedItem.notes || item.notes || ''}
-            onNotesUpdate={(notes) =>
-              setEditedItem((prev) => ({
-                ...prev,
-                notes,
-              }))
-            }
-            onConfirm={async () => {
-              await onRefresh?.();
-            }}
-          />
+          /* AI tab: Breakdown + Agent Executor */
+          <div className="space-y-4">
+            <BreakdownSidebarContent
+              itemId={item.id}
+              title={item.title}
+              itemNotes={editedItem.notes || item.notes || ''}
+              onNotesUpdate={(notes) =>
+                setEditedItem((prev) => ({
+                  ...prev,
+                  notes,
+                }))
+              }
+              onConfirm={async () => {
+                await onRefresh?.();
+              }}
+            />
+
+            {/* Agent Executor — launch AI agent to work on this task */}
+            <AgentPanel taskId={item.id} taskTitle={item.title} />
+          </div>
         )}
       </div>
 

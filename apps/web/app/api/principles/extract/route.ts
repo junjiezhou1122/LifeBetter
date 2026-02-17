@@ -48,11 +48,9 @@ export async function POST(request: Request) {
 
 Experiences:
 ${JSON.stringify(experiences.map((e) => ({
-  task: e.task,
-  approach: e.approach,
-  outcome: e.outcome,
-  retrospective: e.retrospective,
-  context: e.context,
+  id: e.id,
+  taskId: e.taskId,
+  content: e.content,
 })), null, 2)}
 
 Existing principles/skills:

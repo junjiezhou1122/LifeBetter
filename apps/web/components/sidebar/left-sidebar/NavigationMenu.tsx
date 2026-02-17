@@ -1,7 +1,7 @@
-import { LayoutDashboard, Target, Calendar, BookOpen, Brain, Code, Monitor, Settings, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Target, Calendar, BookOpen, Code, Monitor, Settings, ChevronRight } from 'lucide-react';
 
 interface NavigationMenuProps {
-  onNavigate: (view: 'board' | 'dashboard' | 'timeline' | 'meta-skills' | 'reflection' | 'principles' | 'agents' | 'settings') => void;
+  onNavigate: (view: 'board' | 'dashboard' | 'timeline' | 'reflection' | 'principles' | 'agents' | 'settings') => void;
 }
 
 export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
@@ -78,18 +78,6 @@ export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
         <div className="flex-1">
           <div className="text-sm font-semibold">Agents</div>
           <div className="text-[11px] text-[#7a6b57]">Parallel agent dashboard</div>
-        </div>
-        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
-      </button>
-
-      <button
-        onClick={() => onNavigate('meta-skills')}
-        className={itemClass}
-      >
-        <Brain className="h-4 w-4" />
-        <div className="flex-1">
-          <div className="text-sm font-semibold">Meta-Skills</div>
-          <div className="text-[11px] text-[#7a6b57]">Legacy skill browser</div>
         </div>
         <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
       </button>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Experience, ExperienceOutcome } from '@/lib/types';
+import type { Experience } from '@/lib/types';
 
 export function useExperiences(taskId?: string) {
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -7,10 +7,10 @@ export function useExperiences(taskId?: string) {
 
   const fetchExperiences = useCallback(async () => {
     try {
-      const res = await fetch('/api/experiences');
+      const url = taskId ? `/api/experiences?taskId=${taskId}` : '/api/experiences';
+      const res = await fetch(url);
       const data = await res.json();
-      const all: Experience[] = Array.isArray(data) ? data : [];
-      setExperiences(taskId ? all.filter((e) => e.taskId === taskId) : all);
+      setExperiences(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch experiences:', err);
     } finally {
@@ -22,20 +22,11 @@ export function useExperiences(taskId?: string) {
     fetchExperiences();
   }, [fetchExperiences]);
 
-  const createExperience = useCallback(async (exp: {
-    taskId: string;
-    task: string;
-    approach: string;
-    outcome: ExperienceOutcome;
-    timeSpent?: number;
-    feedback?: string;
-    retrospective?: Experience['retrospective'];
-    context?: Experience['context'];
-  }) => {
+  const createExperience = useCallback(async (taskId: string, content: string) => {
     const res = await fetch('/api/experiences', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(exp),
+      body: JSON.stringify({ taskId, content }),
     });
     const created = await res.json();
     if (res.ok) {
@@ -44,11 +35,11 @@ export function useExperiences(taskId?: string) {
     return created;
   }, []);
 
-  const updateExperience = useCallback(async (id: string, updates: Partial<Experience>) => {
+  const updateExperience = useCallback(async (id: string, content: string) => {
     const res = await fetch('/api/experiences', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, ...updates }),
+      body: JSON.stringify({ id, content }),
     });
     const updated = await res.json();
     if (res.ok) {

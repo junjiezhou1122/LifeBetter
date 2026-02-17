@@ -30,7 +30,6 @@ export interface Item {
   dueDate?: string;
   principleIds?: string[];
   lifecycleStage?: 'draft' | 'specced' | 'in_progress' | 'validating' | 'done';
-  spec?: import('@/lib/types').TaskSpec;
   agentSessionIds?: string[];
 }
 

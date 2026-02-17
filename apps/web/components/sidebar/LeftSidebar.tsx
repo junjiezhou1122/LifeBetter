@@ -34,7 +34,7 @@ interface LeftSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onItemClick?: (itemId: string) => void;
-  onNavigate?: (view: 'board' | 'dashboard' | 'timeline' | 'meta-skills' | 'reflection' | 'principles') => void;
+  onNavigate?: (view: 'board' | 'dashboard' | 'timeline' | 'reflection' | 'principles' | 'agents' | 'settings') => void;
 }
 
 export function LeftSidebar({ isOpen, onClose, onItemClick, onNavigate }: LeftSidebarProps) {

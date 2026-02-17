@@ -77,7 +77,7 @@ export function ParallelAgentDashboard() {
                 >
                   <div className="flex-1 min-w-0">
                     <p className="truncate text-xs font-medium text-[#2f271c]">
-                      {session.spec?.objective || session.taskId}
+                      {session.prompt?.slice(0, 60) || session.taskId}
                     </p>
                     <p className="text-[10px] text-[#7a6b57]">
                       {session.agentType} | {session.worktreeBranch || 'no worktree'}
@@ -126,7 +126,7 @@ function ActiveAgentCard({ session }: { session: AgentSession }) {
     <div className="rounded-xl border border-[#dbc9ad] bg-white/85 p-2 shadow-[0_4px_12px_rgba(95,67,31,0.08)]">
       <div className="mb-1.5 flex items-center justify-between">
         <p className="truncate text-xs font-semibold text-[#2f271c]">
-          {session.spec?.objective?.slice(0, 50) || session.taskId}
+          {session.prompt?.slice(0, 50) || session.taskId}
         </p>
         <AgentStatusBadge status={session.status} />
       </div>

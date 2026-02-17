@@ -6,41 +6,31 @@ function generateId() {
   return `exp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const taskId = searchParams.get('taskId');
+
   const storage = await readStorage();
-  return NextResponse.json(storage.experiences);
+  const experiences = taskId
+    ? storage.experiences.filter((e) => e.taskId === taskId)
+    : storage.experiences;
+
+  return NextResponse.json(experiences);
 }
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { taskId, task, approach, outcome, timeSpent, feedback, retrospective, context } = body;
+  const { taskId, content } = body;
 
-  if (!taskId || !task || !outcome) {
-    return NextResponse.json({ error: 'taskId, task, and outcome are required' }, { status: 400 });
+  if (!taskId || !content) {
+    return NextResponse.json({ error: 'taskId and content are required' }, { status: 400 });
   }
 
   const now = new Date().toISOString();
   const experience: Experience = {
     id: generateId(),
     taskId,
-    task,
-    approach: approach || '',
-    outcome,
-    timeSpent,
-    feedback,
-    retrospective: retrospective || {
-      whatWorked: '',
-      whatFailed: '',
-      keyTurningPoint: '',
-      ifRedoWouldChange: '',
-      applicableScenarios: [],
-    },
-    context: context || {
-      taskType: '',
-      complexity: '',
-      domain: '',
-      principlesUsed: [],
-    },
+    content,
     createdAt: now,
     updatedAt: now,
   };
@@ -54,7 +44,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   const body = await request.json();
-  const { id, ...updates } = body;
+  const { id, content } = body;
 
   if (!id) {
     return NextResponse.json({ error: 'id is required' }, { status: 400 });
@@ -66,12 +56,10 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Experience not found' }, { status: 404 });
   }
 
-  storage.experiences[index] = {
-    ...storage.experiences[index],
-    ...updates,
-    id: storage.experiences[index].id,
-    updatedAt: new Date().toISOString(),
-  };
+  if (content !== undefined) {
+    storage.experiences[index].content = content;
+  }
+  storage.experiences[index].updatedAt = new Date().toISOString();
   await writeStorage(storage);
 
   return NextResponse.json(storage.experiences[index]);

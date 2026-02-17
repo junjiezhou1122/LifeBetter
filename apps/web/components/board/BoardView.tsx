@@ -1,7 +1,6 @@
 import { BoardHeader } from "./BoardHeader";
 import { KanbanBoard } from "./KanbanBoard";
 import { DashboardInline } from "../dashboard/DashboardInline";
-import { MetaSkillsInline } from "../meta-skills/MetaSkillsInline";
 import { TimelineInline } from "../timeline/TimelineInline";
 import { ReflectionInline } from "../reflection/ReflectionInline";
 import { PrinciplesView } from "../principles/PrinciplesView";
@@ -10,7 +9,7 @@ import { ObsidianSyncSettings } from "../settings/ObsidianSyncSettings";
 import type { DropResult } from "@hello-pangea/dnd";
 import type { Item, NavigationItem, Column, ItemStatus } from "@/types";
 
-type ViewType = "board" | "dashboard" | "timeline" | "meta-skills" | "reflection" | "principles" | "agents" | "settings";
+type ViewType = "board" | "dashboard" | "timeline" | "reflection" | "principles" | "agents" | "settings";
 
 interface BoardViewProps {
   currentView: ViewType;
@@ -61,8 +60,6 @@ export function BoardView({
       <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(255,251,243,0.9),transparent)]" />
 
       {currentView === "dashboard" && <DashboardInline />}
-
-      {currentView === "meta-skills" && <MetaSkillsInline />}
 
       {currentView === "timeline" && <TimelineInline />}
 

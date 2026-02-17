@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { listSessions, startSession, cancelSession, getSession } from '@/lib/server/agent-manager';
-import type { AgentType, TaskSpec } from '@/lib/types';
+import type { AgentType } from '@/lib/types';
 
 export async function GET() {
   return NextResponse.json(listSessions());
 }
 
 export async function POST(request: Request) {
-  const { action, taskId, agentType, spec, sessionId, cwd, useWorktree } = await request.json();
+  const { action, taskId, agentType, prompt, sessionId, cwd, useWorktree } = await request.json();
 
   if (action === 'cancel') {
     if (!sessionId) {
@@ -29,14 +29,14 @@ export async function POST(request: Request) {
   }
 
   // Default: start a new session
-  if (!taskId || !agentType || !spec) {
-    return NextResponse.json({ error: 'taskId, agentType, and spec are required' }, { status: 400 });
+  if (!taskId || !agentType || !prompt) {
+    return NextResponse.json({ error: 'taskId, agentType, and prompt are required' }, { status: 400 });
   }
 
   const session = await startSession(
     taskId,
     agentType as AgentType,
-    spec as TaskSpec,
+    prompt,
     cwd,
     useWorktree ?? true,
   );

@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, Square, Zap, RefreshCw } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import { AgentTerminal } from './AgentTerminal';
 import { AgentStatusBadge } from './AgentStatusBadge';
 import { ValidationReport } from './ValidationReport';
 import { CheckpointTimeline } from '../checkpoints/CheckpointTimeline';
 import { useAgentSession } from '@/hooks/useAgentSession';
-import type { AgentType, TaskSpec, AgentSessionStatus } from '@/lib/types';
+import type { AgentType, AgentSessionStatus } from '@/lib/types';
 
 interface AgentPanelProps {
   taskId: string;
@@ -18,8 +18,7 @@ export function AgentPanel({ taskId, taskTitle }: AgentPanelProps) {
   const [agentType, setAgentType] = useState<AgentType>('claude-code');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [status, setStatus] = useState<AgentSessionStatus | null>(null);
-  const [generating, setGenerating] = useState(false);
-  const [spec, setSpec] = useState<TaskSpec | null>(null);
+  const [prompt, setPrompt] = useState(taskTitle);
   const [useWorktree, setUseWorktree] = useState(true);
 
   const { messages, session, connected, cancel } = useAgentSession(sessionId);
@@ -34,30 +33,14 @@ export function AgentPanel({ taskId, taskTitle }: AgentPanelProps) {
     }
   }, [messages]);
 
-  const handleGenerateSpec = async () => {
-    setGenerating(true);
-    try {
-      const res = await fetch('/api/spec/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId: taskId }),
-      });
-      const data = await res.json();
-      if (data.spec) setSpec(data.spec);
-    } catch (err) {
-      console.error('Failed to generate spec:', err);
-    }
-    setGenerating(false);
-  };
-
   const handleStart = async () => {
-    if (!spec) return;
+    if (!prompt.trim()) return;
 
     try {
       const res = await fetch('/api/agent/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ taskId, agentType, spec, useWorktree }),
+        body: JSON.stringify({ taskId, agentType, prompt: prompt.trim(), useWorktree }),
       });
       const s = await res.json();
       setSessionId(s.id);
@@ -109,62 +92,25 @@ export function AgentPanel({ taskId, taskTitle }: AgentPanelProps) {
           <span className="font-medium">Isolate in git worktree</span>
         </label>
 
-        {/* Generate spec */}
-        {!spec && (
-          <button
-            onClick={handleGenerateSpec}
-            disabled={generating}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#f7ead5] px-4 py-2 text-xs font-semibold text-[#6c5d47] transition hover:bg-[#f2e1c7] disabled:opacity-50"
-          >
-            <Zap className="h-3.5 w-3.5" />
-            {generating ? 'Generating Spec...' : 'Generate Task Spec'}
-          </button>
-        )}
-
-        {/* Show spec */}
-        {spec && (
-          <div className="mb-3 space-y-2">
-            <div className="rounded-lg border border-[#e8dcc9] bg-[#faf6ef] p-2.5">
-              <p className="mb-1 text-[11px] font-semibold text-[#6c5d47]">Objective</p>
-              <p className="text-xs text-[#2f271c]">{spec.objective}</p>
-            </div>
-
-            {spec.requirements.length > 0 && (
-              <div className="rounded-lg border border-[#e8dcc9] bg-[#faf6ef] p-2.5">
-                <p className="mb-1 text-[11px] font-semibold text-[#6c5d47]">Requirements</p>
-                <ul className="list-inside list-disc text-xs text-[#5d4b34]">
-                  {spec.requirements.map((r, i) => <li key={i}>{r}</li>)}
-                </ul>
-              </div>
-            )}
-
-            {spec.principleInstructions.length > 0 && (
-              <div className="rounded-lg border border-[#e8dcc9] bg-[#faf6ef] p-2.5">
-                <p className="mb-1 text-[11px] font-semibold text-[#6c5d47]">Skills Applied</p>
-                <ul className="list-inside list-disc text-xs text-[#5d4b34]">
-                  {spec.principleInstructions.map((p, i) => <li key={i}>{p}</li>)}
-                </ul>
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <button
-                onClick={handleGenerateSpec}
-                disabled={generating}
-                className="flex items-center gap-1.5 rounded-lg border border-[#dbc9ad] px-3 py-1.5 text-xs font-semibold text-[#6c5d47] transition hover:bg-[#f7ead5]"
-              >
-                <RefreshCw className="h-3 w-3" />
-                Regenerate
-              </button>
-            </div>
+        {/* Prompt input */}
+        {!sessionId && (
+          <div className="mb-3">
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Describe what the agent should do..."
+              rows={3}
+              className="w-full resize-none rounded-lg border border-[#dbc9ad] bg-[#faf6ef] p-2.5 text-xs text-[#2f271c] placeholder-[#8e7e67] focus:border-[#d26a3b] focus:outline-none"
+            />
           </div>
         )}
 
         {/* Start / Cancel buttons */}
-        {spec && !sessionId && (
+        {!sessionId && (
           <button
             onClick={handleStart}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#d26a3b] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#bb5a2f]"
+            disabled={!prompt.trim()}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#d26a3b] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#bb5a2f] disabled:opacity-50"
           >
             <Play className="h-3.5 w-3.5" />
             Start Agent

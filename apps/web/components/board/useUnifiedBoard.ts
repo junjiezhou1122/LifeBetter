@@ -23,7 +23,7 @@ export function useUnifiedBoard() {
     return true;
   });
 
-  const [currentView, setCurrentView] = useState<'board' | 'dashboard' | 'timeline' | 'meta-skills' | 'reflection' | 'principles' | 'agents' | 'settings'>('board');
+  const [currentView, setCurrentView] = useState<'board' | 'dashboard' | 'timeline' | 'reflection' | 'principles' | 'agents' | 'settings'>('board');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
