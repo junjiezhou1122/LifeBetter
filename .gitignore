@@ -45,3 +45,6 @@ logs/
 .env
 .env.local
 .env.production
+
+# Git worktrees for agent isolation
+worktrees/

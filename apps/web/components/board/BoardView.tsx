@@ -4,10 +4,13 @@ import { DashboardInline } from "../dashboard/DashboardInline";
 import { MetaSkillsInline } from "../meta-skills/MetaSkillsInline";
 import { TimelineInline } from "../timeline/TimelineInline";
 import { ReflectionInline } from "../reflection/ReflectionInline";
+import { PrinciplesView } from "../principles/PrinciplesView";
+import { ParallelAgentDashboard } from "../agent/ParallelAgentDashboard";
+import { ObsidianSyncSettings } from "../settings/ObsidianSyncSettings";
 import type { DropResult } from "@hello-pangea/dnd";
 import type { Item, NavigationItem, Column, ItemStatus } from "@/types";
 
-type ViewType = "board" | "dashboard" | "timeline" | "meta-skills" | "reflection";
+type ViewType = "board" | "dashboard" | "timeline" | "meta-skills" | "reflection" | "principles" | "agents" | "settings";
 
 interface BoardViewProps {
   currentView: ViewType;
@@ -64,6 +67,17 @@ export function BoardView({
       {currentView === "timeline" && <TimelineInline />}
 
       {currentView === "reflection" && <ReflectionInline />}
+
+      {currentView === "principles" && <PrinciplesView />}
+
+      {currentView === "agents" && <ParallelAgentDashboard />}
+
+      {currentView === "settings" && (
+        <div className="relative flex h-full min-h-0 flex-col overflow-auto px-3 pb-4 pt-3 md:px-4 md:pb-5 md:pt-3.5">
+          <h2 className="mb-4 text-lg font-bold text-[#2f271c]">Settings</h2>
+          <ObsidianSyncSettings />
+        </div>
+      )}
 
       {currentView === "board" && (
         <div className="relative flex h-full min-h-0 flex-col overflow-hidden px-3 pb-4 pt-3 md:px-4 md:pb-5 md:pt-3.5">

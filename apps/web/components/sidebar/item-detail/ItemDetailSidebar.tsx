@@ -5,6 +5,7 @@ import { ItemSidebarHeader } from './ItemSidebarHeader';
 import { ItemSidebarTabs, type TabType } from './ItemSidebarTabs';
 import { ItemDetailsContent } from './ItemDetailsContent';
 import { ItemNotesContent } from './ItemNotesContent';
+import { ItemExperienceContent } from './ItemExperienceContent';
 import { ItemSidebarFooter } from './ItemSidebarFooter';
 import { BreakdownSidebarContent } from '../breakdown/BreakdownSidebarContent';
 import type { Item, MetaSkill } from '@/types';
@@ -37,6 +38,7 @@ export function ItemDetailSidebar({
     blocking: i.blocking ?? [],
     tags: i.tags ?? [],
     metaSkillIds: i.metaSkillIds ?? [],
+    principleIds: i.principleIds ?? [],
   });
 
   const [editedItem, setEditedItem] = useState<Item>(() => normalizeItem(item));
@@ -131,6 +133,8 @@ export function ItemDetailSidebar({
             onNotesModeChange={setNotesMode}
             onSave={handleSave}
           />
+        ) : activeTab === 'experience' ? (
+          <ItemExperienceContent item={item} />
         ) : (
           <BreakdownSidebarContent
             itemId={item.id}

@@ -1,7 +1,7 @@
-import { LayoutDashboard, Target, Calendar, BookOpen, Brain, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Target, Calendar, BookOpen, Brain, Code, Monitor, Settings, ChevronRight } from 'lucide-react';
 
 interface NavigationMenuProps {
-  onNavigate: (view: 'board' | 'dashboard' | 'timeline' | 'meta-skills' | 'reflection') => void;
+  onNavigate: (view: 'board' | 'dashboard' | 'timeline' | 'meta-skills' | 'reflection' | 'principles' | 'agents' | 'settings') => void;
 }
 
 export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
@@ -35,6 +35,18 @@ export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
       </button>
 
       <button
+        onClick={() => onNavigate('principles')}
+        className={itemClass}
+      >
+        <Code className="h-4 w-4" />
+        <div className="flex-1">
+          <div className="text-sm font-semibold">Skills</div>
+          <div className="text-[11px] text-[#7a6b57]">AI agent skills & principles</div>
+        </div>
+        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
+      </button>
+
+      <button
         onClick={() => onNavigate('timeline')}
         className={itemClass}
       >
@@ -59,13 +71,37 @@ export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
       </button>
 
       <button
+        onClick={() => onNavigate('agents')}
+        className={itemClass}
+      >
+        <Monitor className="h-4 w-4" />
+        <div className="flex-1">
+          <div className="text-sm font-semibold">Agents</div>
+          <div className="text-[11px] text-[#7a6b57]">Parallel agent dashboard</div>
+        </div>
+        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
+      </button>
+
+      <button
         onClick={() => onNavigate('meta-skills')}
         className={itemClass}
       >
         <Brain className="h-4 w-4" />
         <div className="flex-1">
           <div className="text-sm font-semibold">Meta-Skills</div>
-          <div className="text-[11px] text-[#7a6b57]">Browse & manage skills</div>
+          <div className="text-[11px] text-[#7a6b57]">Legacy skill browser</div>
+        </div>
+        <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
+      </button>
+
+      <button
+        onClick={() => onNavigate('settings')}
+        className={itemClass}
+      >
+        <Settings className="h-4 w-4" />
+        <div className="flex-1">
+          <div className="text-sm font-semibold">Settings</div>
+          <div className="text-[11px] text-[#7a6b57]">Obsidian sync & config</div>
         </div>
         <ChevronRight className="h-3.5 w-3.5 text-[#8e7e67]" />
       </button>

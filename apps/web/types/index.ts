@@ -28,6 +28,10 @@ export interface Item {
   estimatedHours?: number;
   actualHours?: number;
   dueDate?: string;
+  principleIds?: string[];
+  lifecycleStage?: 'draft' | 'specced' | 'in_progress' | 'validating' | 'done';
+  spec?: import('@/lib/types').TaskSpec;
+  agentSessionIds?: string[];
 }
 
 export interface NavigationItem {
